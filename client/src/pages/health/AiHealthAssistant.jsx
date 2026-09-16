@@ -20,7 +20,10 @@ const AiHealthAssistant = ({ navigation }) => {
   ];
 
   const handleSend = async (textOverride = null) => {
-    const userMsg = textOverride || inputText.trim();
+    if (isLoading) return; // Prevent double submission
+    
+    const actualOverride = typeof textOverride === 'string' ? textOverride : null;
+    const userMsg = actualOverride || inputText.trim();
     if (!userMsg) return;
 
     setInputText('');
@@ -58,8 +61,8 @@ const AiHealthAssistant = ({ navigation }) => {
   return (
     <KeyboardAvoidingView 
       style={styles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 15}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -75,18 +78,20 @@ const AiHealthAssistant = ({ navigation }) => {
         style={styles.chatArea}
         ref={scrollViewRef}
         onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+        contentContainerStyle={{ paddingBottom: 60 }} // Extra padding for the floating suggestions
       >
         {messages.map((msg) => (
           <View key={msg.id} style={msg.role === 'bot' ? styles.botMessageWrapper : styles.userMessageWrapper}>
             {msg.role === 'bot' && (
               <View style={styles.botTitleContainer}>
                 <Text style={styles.botTitle}>BAYMAX</Text>
-                {msg.text === '' && <Text style={styles.typingIndicator}>● ● ●</Text>}
               </View>
             )}
             <View style={msg.role === 'bot' ? styles.botMessageCard : styles.userMessage}>
               {msg.role === 'bot' && msg.text === '' ? (
-                <ActivityIndicator size="small" color={colors.primary} />
+                <View style={styles.typingIndicatorContainer}>
+                  <Text style={styles.typingIndicator}>● ● ●</Text>
+                </View>
               ) : (
                 <Text style={styles.messageText}>{msg.text}</Text>
               )}
@@ -95,33 +100,35 @@ const AiHealthAssistant = ({ navigation }) => {
         ))}
       </ScrollView>
 
-      {/* Floating Suggestions Area */}
-      <View style={styles.suggestionsContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScroll}>
-          {suggestions.map((item, index) => (
-            <TouchableOpacity key={index} style={styles.suggestionChip} onPress={() => handleSend(item)}>
-              <Text style={styles.suggestionText}>{item}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+      <View style={styles.bottomAreaContainer}>
+        {/* Floating Suggestions Area */}
+        <View style={styles.suggestionsContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScroll}>
+            {suggestions.map((item, index) => (
+              <TouchableOpacity key={index} style={styles.suggestionChip} onPress={() => handleSend(item)}>
+                <Text style={styles.suggestionText}>{item}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
-      <View style={styles.inputArea}>
-        <TouchableOpacity style={styles.micButton} onPress={() => navigation.navigate('VoiceInputModal')}>
-          <Ionicons name="mic" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <View style={styles.textInputContainer}>
-          <TextInput 
-            style={styles.textInput}
-            placeholder="Ask a health question..."
-            placeholderTextColor={colors.darkGray}
-            value={inputText}
-            onChangeText={setInputText}
-            onSubmitEditing={() => handleSend()}
-          />
-          <TouchableOpacity style={styles.sendButton} onPress={() => handleSend()}>
-            <Ionicons name="send" size={20} color={colors.black} />
+        <View style={styles.inputArea}>
+          <TouchableOpacity style={styles.micButton} onPress={() => navigation.navigate('VoiceInputModal')}>
+            <Ionicons name="mic" size={24} color={colors.black} />
           </TouchableOpacity>
+          <View style={styles.textInputContainer}>
+            <TextInput 
+              style={styles.textInput}
+              placeholder="Ask a health question..."
+              placeholderTextColor={colors.darkGray}
+              value={inputText}
+              onChangeText={setInputText}
+              onSubmitEditing={() => handleSend()}
+            />
+            <TouchableOpacity style={styles.sendButton} onPress={() => handleSend()}>
+              <Ionicons name="send" size={20} color={colors.black} />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -138,7 +145,9 @@ const styles = StyleSheet.create({
     paddingBottom: 16, 
     paddingHorizontal: 20, 
     borderBottomWidth: 1, 
-    borderBottomColor: colors.border 
+    borderBottomColor: colors.border,
+    backgroundColor: colors.white,
+    zIndex: 10
   },
   backButton: { padding: 4 },
   moreButton: { padding: 4 },
@@ -146,48 +155,61 @@ const styles = StyleSheet.create({
   
   chatArea: { flex: 1, padding: 16 },
   
-  botMessageWrapper: { marginBottom: 12 },
-  userMessageWrapper: { marginBottom: 12 },
+  botMessageWrapper: { marginBottom: 16 },
+  userMessageWrapper: { marginBottom: 16 },
   
-  botTitleContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-  botTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, marginRight: 8 },
-  typingIndicator: { fontSize: 16, color: colors.darkGray, letterSpacing: 2 },
+  botTitleContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 4, marginLeft: 4 },
+  botTitle: { fontSize: 12, fontWeight: 'bold', color: colors.darkGray },
   
   botMessageCard: { 
-    backgroundColor: colors.white, 
-    borderWidth: 1,
-    borderColor: colors.border,
+    backgroundColor: '#f3f4f6', 
     padding: 16, 
-    borderRadius: globalStyles.cardRadius, 
+    borderRadius: 20,
+    borderBottomLeftRadius: 4,
     maxWidth: '85%', 
     alignSelf: 'flex-start' 
   },
   userMessage: { 
-    backgroundColor: colors.white, 
-    borderWidth: 1,
-    borderColor: colors.black,
+    backgroundColor: colors.primary, 
     padding: 16, 
-    borderRadius: globalStyles.cardRadius, 
+    borderRadius: 20, 
+    borderBottomRightRadius: 4,
     maxWidth: '85%', 
     alignSelf: 'flex-end' 
   },
   messageText: { fontSize: 16, color: colors.black, lineHeight: 24 },
   
-  suggestionsContainer: {
+  typingIndicatorContainer: { paddingVertical: 4, paddingHorizontal: 8 },
+  typingIndicator: { fontSize: 18, color: colors.darkGray, letterSpacing: 2 },
+  
+  bottomAreaContainer: {
     backgroundColor: colors.white,
+  },
+  suggestionsContainer: {
+    backgroundColor: 'transparent',
     paddingVertical: 10,
+    position: 'absolute',
+    top: -50,
+    left: 0,
+    right: 0,
+    zIndex: 5,
   },
   suggestionsScroll: {
     paddingHorizontal: 16,
     gap: 10,
   },
   suggestionChip: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   suggestionText: {
     color: colors.black,
@@ -204,7 +226,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: Platform.OS === 'ios' ? 30 : 16
   },
-  micButton: { marginRight: 16 },
+  micButton: { marginRight: 12, backgroundColor: colors.lightGray, padding: 12, borderRadius: 24 },
   textInputContainer: { 
     flex: 1, 
     flexDirection: 'row',
@@ -215,7 +237,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20 
   },
   textInput: { flex: 1, fontSize: 16, color: colors.black },
-  sendButton: { marginLeft: 10 }
+  sendButton: { marginLeft: 10, padding: 4 }
 });
 
 export default AiHealthAssistant;

@@ -10,28 +10,53 @@ const DiseaseModule = ({ navigation }) => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={colors.black} />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>DISEASE PREVENTION</Text>
         <View style={{ width: 32 }} />
       </View>
 
       <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>MOCK DATA OVERVIEW</Text>
         
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Information Details</Text>
-          <Text style={styles.cardText}>This is a placeholder page for DISEASE MODULE. Here you would typically see relevant data fetched from the backend API.</Text>
+        <View style={styles.heroCard}>
+          <Text style={styles.heroEmoji}>🦠</Text>
+          <Text style={styles.heroTitle}>Stay Healthy & Safe</Text>
+          <Text style={styles.heroSub}>Understand common diseases, symptoms, and how to protect yourself.</Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recent Activity</Text>
-          <Text style={styles.cardText}>• Checked in at 9:00 AM</Text>
-          <Text style={styles.cardText}>• Updated preferences</Text>
-          <Text style={styles.cardText}>• Synced with wearable</Text>
-        </View>
+        <Text style={styles.sectionTitle}>LESSONS (0/3 COMPLETED)</Text>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Edit Details</Text>
+        <TouchableOpacity style={[styles.lessonCard, { borderColor: colors.primary, borderWidth: 2 }]} onPress={() => navigation.navigate('LessonDetails', { title: 'Understanding Viruses' })}>
+          <View style={styles.lessonIconBox}>
+            <Text style={styles.lessonIcon}>🤧</Text>
+          </View>
+          <View style={styles.lessonInfo}>
+            <Text style={styles.lessonTitle}>Understanding Viruses</Text>
+            <Text style={styles.lessonTime}>12 mins • Up Next</Text>
+          </View>
+          <Ionicons name="play-circle" size={28} color={colors.primary} />
         </TouchableOpacity>
-        
+
+        <TouchableOpacity style={styles.lessonCard} onPress={() => navigation.navigate('LessonDetails', { title: 'Hygiene Best Practices' })}>
+          <View style={styles.lessonIconBox}>
+            <Text style={styles.lessonIcon}>🧼</Text>
+          </View>
+          <View style={styles.lessonInfo}>
+            <Text style={styles.lessonTitle}>Hygiene Best Practices</Text>
+            <Text style={styles.lessonTime}>8 mins • Locked</Text>
+          </View>
+          <Ionicons name="lock-closed" size={20} color={colors.border} />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.lessonCard} onPress={() => navigation.navigate('LessonDetails', { title: 'Immune System Basics' })}>
+          <View style={styles.lessonIconBox}>
+            <Text style={styles.lessonIcon}>🛡️</Text>
+          </View>
+          <View style={styles.lessonInfo}>
+            <Text style={styles.lessonTitle}>Immune System Basics</Text>
+            <Text style={styles.lessonTime}>15 mins • Locked</Text>
+          </View>
+          <Ionicons name="lock-closed" size={20} color={colors.border} />
+        </TouchableOpacity>
+
         <View style={{ height: 40 }} />
       </ScrollView>
     </View>
@@ -39,7 +64,7 @@ const DiseaseModule = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -51,31 +76,47 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, 
     borderBottomColor: colors.border 
   },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
   backButton: { padding: 4 },
-  title: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
   
   content: { padding: 20 },
+  
+  heroCard: {
+    backgroundColor: '#ffebee',
+    padding: 24,
+    borderRadius: globalStyles.cardRadius,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  heroEmoji: { fontSize: 48, marginBottom: 12 },
+  heroTitle: { fontSize: 20, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
+  heroSub: { fontSize: 14, color: colors.darkGray, textAlign: 'center', lineHeight: 20 },
+
   sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
   
-  card: { 
-    backgroundColor: colors.white, 
+  lessonCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 20, 
-    borderRadius: globalStyles.cardRadius, 
-    marginBottom: 16 
+    padding: 16,
+    borderRadius: globalStyles.cardRadius,
+    marginBottom: 12,
   },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
-  cardText: { fontSize: 16, color: colors.darkGray, marginBottom: 4, lineHeight: 24 },
-  
-  actionButton: { 
-    backgroundColor: colors.primary, 
-    padding: 16, 
-    borderRadius: globalStyles.buttonRadius, 
-    alignItems: 'center', 
-    marginTop: 10 
+  lessonIconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: colors.lightGray,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
   },
-  actionButtonText: { color: colors.black, fontSize: 16, fontWeight: 'bold' }
+  lessonIcon: { fontSize: 24 },
+  lessonInfo: { flex: 1 },
+  lessonTitle: { fontSize: 16, fontWeight: 'bold', color: colors.black, marginBottom: 4 },
+  lessonTime: { fontSize: 12, color: colors.darkGray },
 });
 
 export default DiseaseModule;

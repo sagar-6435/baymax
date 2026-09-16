@@ -4,34 +4,65 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 
 const ReviewAnswers = ({ navigation }) => {
+  const mockReviews = [
+    {
+      question: "Which of the following is considered a macronutrient?",
+      yourAnswer: "Protein",
+      correctAnswer: "Protein",
+      isCorrect: true,
+      explanation: "Proteins, carbohydrates, and fats are the three main macronutrients essential for the body."
+    },
+    {
+      question: "How many liters of water should an average adult drink daily?",
+      yourAnswer: "2-3 Liters",
+      correctAnswer: "2-3 Liters",
+      isCorrect: true,
+      explanation: "The U.S. National Academies of Sciences, Engineering, and Medicine determined that an adequate daily fluid intake is about 2.7 to 3.7 liters."
+    },
+    {
+      question: "Which organ is primarily responsible for pumping blood?",
+      yourAnswer: "Lungs",
+      correctAnswer: "Heart",
+      isCorrect: false,
+      explanation: "The heart pumps blood throughout the body, while the lungs are responsible for oxygenating the blood."
+    }
+  ];
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
+          <Ionicons name="close" size={24} color={colors.black} />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>REVIEW ANSWERS</Text>
         <View style={{ width: 32 }} />
       </View>
 
       <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>MOCK DATA OVERVIEW</Text>
         
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Information Details</Text>
-          <Text style={styles.cardText}>This is a placeholder page for REVIEW ANSWERS. Here you would typically see relevant data fetched from the backend API.</Text>
-        </View>
+        {mockReviews.map((item, index) => (
+          <View key={index} style={styles.reviewCard}>
+            <Text style={styles.questionText}>{index + 1}. {item.question}</Text>
+            
+            <View style={styles.answerRow}>
+              <Ionicons name={item.isCorrect ? "checkmark-circle" : "close-circle"} size={20} color={item.isCorrect ? colors.primary : colors.error || 'red'} />
+              <Text style={styles.yourAnswerText}>Your Answer: {item.yourAnswer}</Text>
+            </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recent Activity</Text>
-          <Text style={styles.cardText}>• Checked in at 9:00 AM</Text>
-          <Text style={styles.cardText}>• Updated preferences</Text>
-          <Text style={styles.cardText}>• Synced with wearable</Text>
-        </View>
+            {!item.isCorrect && (
+              <View style={styles.correctAnswerRow}>
+                <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                <Text style={styles.correctAnswerText}>Correct Answer: {item.correctAnswer}</Text>
+              </View>
+            )}
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Edit Details</Text>
-        </TouchableOpacity>
-        
+            <View style={styles.explanationBox}>
+              <Text style={styles.explanationTitle}>Explanation</Text>
+              <Text style={styles.explanationText}>{item.explanation}</Text>
+            </View>
+          </View>
+        ))}
+
         <View style={{ height: 40 }} />
       </ScrollView>
     </View>
@@ -51,31 +82,30 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, 
     borderBottomColor: colors.border 
   },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
   backButton: { padding: 4 },
-  title: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
   
   content: { padding: 20 },
-  sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
   
-  card: { 
+  reviewCard: { 
     backgroundColor: colors.white, 
     borderWidth: 1,
     borderColor: colors.border,
     padding: 20, 
     borderRadius: globalStyles.cardRadius, 
-    marginBottom: 16 
+    marginBottom: 20 
   },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
-  cardText: { fontSize: 16, color: colors.darkGray, marginBottom: 4, lineHeight: 24 },
+  questionText: { fontSize: 16, fontWeight: 'bold', color: colors.black, marginBottom: 16, lineHeight: 24 },
   
-  actionButton: { 
-    backgroundColor: colors.primary, 
-    padding: 16, 
-    borderRadius: globalStyles.buttonRadius, 
-    alignItems: 'center', 
-    marginTop: 10 
-  },
-  actionButtonText: { color: colors.black, fontSize: 16, fontWeight: 'bold' }
+  answerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  yourAnswerText: { fontSize: 14, color: colors.black, marginLeft: 8, fontWeight: 'bold' },
+  
+  correctAnswerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, backgroundColor: '#f0fdf4', padding: 8, borderRadius: 8 },
+  correctAnswerText: { fontSize: 14, color: '#166534', marginLeft: 8, fontWeight: 'bold' },
+  
+  explanationBox: { marginTop: 12, backgroundColor: colors.lightGray, padding: 12, borderRadius: 8 },
+  explanationTitle: { fontSize: 12, fontWeight: 'bold', color: colors.darkGray, marginBottom: 4, textTransform: 'uppercase' },
+  explanationText: { fontSize: 14, color: colors.darkGray, lineHeight: 20 }
 });
 
 export default ReviewAnswers;

@@ -1,37 +1,62 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 
+const { width } = Dimensions.get('window');
+const BADGE_SIZE = (width - 60 - 32) / 3;
+
 const AchievementsBadges = ({ navigation }) => {
+  const badges = [
+    { id: 1, icon: '🏆', name: 'First Steps', desc: 'Complete your first lesson.', unlocked: true },
+    { id: 2, icon: '🧠', name: 'Brainiac', desc: 'Score 100% on a quiz.', unlocked: true },
+    { id: 3, icon: '🔥', name: 'On Fire', desc: 'Maintain a 3-day streak.', unlocked: true },
+    { id: 4, icon: '🎓', name: 'Scholar', desc: 'Complete an entire module.', unlocked: true },
+    { id: 5, icon: '🌟', name: 'Super Star', desc: 'Earn 1000 total XP.', unlocked: false },
+    { id: 6, icon: '🏃', name: 'Marathon', desc: 'Complete 10 lessons.', unlocked: false },
+    { id: 7, icon: '🩺', name: 'Doctor', desc: 'Pass all health quizzes.', unlocked: false },
+  ];
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={colors.black} />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>ACHIEVEMENTS</Text>
         <View style={{ width: 32 }} />
       </View>
 
       <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>MOCK DATA OVERVIEW</Text>
         
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Information Details</Text>
-          <Text style={styles.cardText}>This is a placeholder page for ACHIEVEMENTS BADGES. Here you would typically see relevant data fetched from the backend API.</Text>
+        <View style={styles.summaryCard}>
+          <View style={styles.summaryInfo}>
+            <Text style={styles.summaryCount}>4 / 12</Text>
+            <Text style={styles.summaryLabel}>Badges Unlocked</Text>
+          </View>
+          <Ionicons name="medal-outline" size={48} color={colors.primary} />
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recent Activity</Text>
-          <Text style={styles.cardText}>• Checked in at 9:00 AM</Text>
-          <Text style={styles.cardText}>• Updated preferences</Text>
-          <Text style={styles.cardText}>• Synced with wearable</Text>
+        <Text style={styles.sectionTitle}>YOUR COLLECTION</Text>
+
+        <View style={styles.badgesGrid}>
+          {badges.map((badge) => (
+            <View key={badge.id} style={styles.badgeWrapper}>
+              <View style={[styles.badgeIconBox, !badge.unlocked && styles.badgeLockedBox]}>
+                {badge.unlocked ? (
+                  <Text style={styles.badgeEmoji}>{badge.icon}</Text>
+                ) : (
+                  <Ionicons name="lock-closed" size={24} color={colors.border} />
+                )}
+              </View>
+              <Text style={styles.badgeName}>{badge.name}</Text>
+              <Text style={styles.badgeDesc} numberOfLines={2} ellipsizeMode="tail">
+                {badge.desc}
+              </Text>
+            </View>
+          ))}
         </View>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Edit Details</Text>
-        </TouchableOpacity>
-        
         <View style={{ height: 40 }} />
       </ScrollView>
     </View>
@@ -39,7 +64,7 @@ const AchievementsBadges = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -51,31 +76,56 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, 
     borderBottomColor: colors.border 
   },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
   backButton: { padding: 4 },
-  title: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
   
   content: { padding: 20 },
+  
+  summaryCard: {
+    flexDirection: 'row',
+    backgroundColor: '#fffde7',
+    borderRadius: globalStyles.cardRadius,
+    padding: 24,
+    marginBottom: 30,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  summaryInfo: { flex: 1 },
+  summaryCount: { fontSize: 32, fontWeight: 'bold', color: colors.black, marginBottom: 4 },
+  summaryLabel: { fontSize: 14, color: colors.darkGray },
+  
   sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
   
-  card: { 
-    backgroundColor: colors.white, 
-    borderWidth: 1,
+  badgesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between'
+  },
+  badgeWrapper: {
+    width: BADGE_SIZE,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  badgeIconBox: {
+    width: BADGE_SIZE,
+    height: BADGE_SIZE,
+    borderRadius: BADGE_SIZE / 2,
+    backgroundColor: '#e0f7fa',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: '#00bcd4',
+  },
+  badgeLockedBox: {
+    backgroundColor: colors.lightGray,
     borderColor: colors.border,
-    padding: 20, 
-    borderRadius: globalStyles.cardRadius, 
-    marginBottom: 16 
   },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
-  cardText: { fontSize: 16, color: colors.darkGray, marginBottom: 4, lineHeight: 24 },
-  
-  actionButton: { 
-    backgroundColor: colors.primary, 
-    padding: 16, 
-    borderRadius: globalStyles.buttonRadius, 
-    alignItems: 'center', 
-    marginTop: 10 
-  },
-  actionButtonText: { color: colors.black, fontSize: 16, fontWeight: 'bold' }
+  badgeEmoji: { fontSize: 32 },
+  badgeName: { fontSize: 12, fontWeight: 'bold', color: colors.black, textAlign: 'center', marginBottom: 4 },
+  badgeDesc: { fontSize: 10, color: colors.darkGray, textAlign: 'center', lineHeight: 14 },
 });
 
 export default AchievementsBadges;

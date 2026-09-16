@@ -24,7 +24,19 @@ import FirstAidCompletionSummary from '../pages/firstaid/FirstAidCompletionSumma
 // Learning
 import LearningDashboard from '../pages/learning/LearningDashboard';
 import LearningCategories from '../pages/learning/LearningCategories';
+import AnatomyModule from '../pages/learning/AnatomyModule';
+import NutritionModule from '../pages/learning/NutritionModule';
+import DiseaseModule from '../pages/learning/DiseaseModule';
+import FirstAidLearningModule from '../pages/learning/FirstAidLearningModule';
+import MedicationSafetyModule from '../pages/learning/MedicationSafetyModule';
 import LessonDetails from '../pages/learning/LessonDetails';
+import InteractiveLesson from '../pages/learning/InteractiveLesson';
+import Quiz from '../pages/learning/Quiz';
+import QuizQuestion from '../pages/learning/QuizQuestion';
+import QuizResult from '../pages/learning/QuizResult';
+import ReviewAnswers from '../pages/learning/ReviewAnswers';
+import LearningProgress from '../pages/learning/LearningProgress';
+import AchievementsBadges from '../pages/learning/AchievementsBadges';
 
 // Medicine
 import MedicineHome from '../pages/medicine/MedicineHome';
@@ -47,6 +59,16 @@ import PersonalInformation from '../pages/profile/PersonalInformation';
 import HealthPreferences from '../pages/profile/HealthPreferences';
 import EmergencyInformation from '../pages/profile/EmergencyInformation';
 
+// Wellness
+import WellnessDashboard from '../pages/wellness/WellnessDashboard';
+import MoodCheck from '../pages/wellness/MoodCheck';
+import MoodResult from '../pages/wellness/MoodResult';
+import BreathingExercise from '../pages/wellness/BreathingExercise';
+import RelaxationExercise from '../pages/wellness/RelaxationExercise';
+import ActivitySummary from '../pages/wellness/ActivitySummary';
+import WellnessRecommendations from '../pages/wellness/WellnessRecommendations';
+import WellnessHistory from '../pages/wellness/WellnessHistory';
+
 const Stack = createNativeStackNavigator();
 
 export const HomeStack = () => (
@@ -65,6 +87,16 @@ export const HomeStack = () => (
     <Stack.Screen name="AddMedicineReminder" component={AddMedicineReminder} />
     <Stack.Screen name="EditMedicineReminder" component={EditMedicineReminder} />
     <Stack.Screen name="MedicineLearningQuiz" component={MedicineLearningQuiz} />
+    
+    {/* Wellness integrated into HomeStack for easy access */}
+    <Stack.Screen name="WellnessDashboard" component={WellnessDashboard} />
+    <Stack.Screen name="MoodCheck" component={MoodCheck} />
+    <Stack.Screen name="MoodResult" component={MoodResult} />
+    <Stack.Screen name="BreathingExercise" component={BreathingExercise} />
+    <Stack.Screen name="RelaxationExercise" component={RelaxationExercise} />
+    <Stack.Screen name="ActivitySummary" component={ActivitySummary} />
+    <Stack.Screen name="WellnessRecommendations" component={WellnessRecommendations} />
+    <Stack.Screen name="WellnessHistory" component={WellnessHistory} />
   </Stack.Navigator>
 );
 
@@ -93,7 +125,19 @@ export const LearningStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="LearningDashboard" component={LearningDashboard} />
     <Stack.Screen name="LearningCategories" component={LearningCategories} />
+    <Stack.Screen name="AnatomyModule" component={AnatomyModule} />
+    <Stack.Screen name="NutritionModule" component={NutritionModule} />
+    <Stack.Screen name="DiseaseModule" component={DiseaseModule} />
+    <Stack.Screen name="FirstAidLearningModule" component={FirstAidLearningModule} />
+    <Stack.Screen name="MedicationSafetyModule" component={MedicationSafetyModule} />
     <Stack.Screen name="LessonDetails" component={LessonDetails} />
+    <Stack.Screen name="InteractiveLesson" component={InteractiveLesson} />
+    <Stack.Screen name="Quiz" component={Quiz} />
+    <Stack.Screen name="QuizQuestion" component={QuizQuestion} />
+    <Stack.Screen name="QuizResult" component={QuizResult} />
+    <Stack.Screen name="ReviewAnswers" component={ReviewAnswers} />
+    <Stack.Screen name="LearningProgress" component={LearningProgress} />
+    <Stack.Screen name="AchievementsBadges" component={AchievementsBadges} />
   </Stack.Navigator>
 );
 
@@ -107,5 +151,3 @@ export const ProfileStack = () => (
     <Stack.Screen name="PrivacyCenter" component={PrivacyCenter} />
   </Stack.Navigator>
 );
-
-// Removing MedicineStack as the screens are now directly in HomeStack

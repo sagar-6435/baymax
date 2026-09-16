@@ -1,81 +1,90 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 
-const Quiz = ({ navigation }) => {
+const Quiz = ({ navigation, route }) => {
+  const title = route?.params?.title || "Health Quiz";
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
+          <Ionicons name="close" size={28} color={colors.black} />
         </TouchableOpacity>
-        <View style={{ width: 32 }} />
       </View>
 
-      <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>MOCK DATA OVERVIEW</Text>
+      <View style={styles.content}>
+        <View style={styles.emojiContainer}>
+          <Text style={styles.bigEmoji}>📝</Text>
+        </View>
         
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Information Details</Text>
-          <Text style={styles.cardText}>This is a placeholder page for QUIZ. Here you would typically see relevant data fetched from the backend API.</Text>
-        </View>
+        <Text style={styles.title}>Ready for a quick check?</Text>
+        <Text style={styles.subtitle}>Test your knowledge on "{title}". There are 3 questions to complete this lesson.</Text>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recent Activity</Text>
-          <Text style={styles.cardText}>• Checked in at 9:00 AM</Text>
-          <Text style={styles.cardText}>• Updated preferences</Text>
-          <Text style={styles.cardText}>• Synced with wearable</Text>
+        <View style={styles.statsContainer}>
+          <View style={styles.statBox}>
+            <Ionicons name="help-circle-outline" size={24} color={colors.primary} />
+            <Text style={styles.statText}>3 Questions</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Ionicons name="time-outline" size={24} color={colors.primary} />
+            <Text style={styles.statText}>~2 Mins</Text>
+          </View>
         </View>
+      </View>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Edit Details</Text>
+      <View style={styles.footer}>
+        <TouchableOpacity 
+          style={styles.startButton} 
+          onPress={() => navigation.navigate('QuizQuestion', { title, questionIndex: 0 })}
+        >
+          <Text style={styles.startButtonText}>Let's Go!</Text>
         </TouchableOpacity>
-        
-        <View style={{ height: 40 }} />
-      </ScrollView>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    justifyContent: 'space-between', 
     paddingTop: 50, 
-    paddingBottom: 16, 
     paddingHorizontal: 20, 
     backgroundColor: colors.white,
-    borderBottomWidth: 1, 
-    borderBottomColor: colors.border 
   },
   backButton: { padding: 4 },
-  title: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
   
-  content: { padding: 20 },
-  sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
+  content: { flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center' },
   
-  card: { 
-    backgroundColor: colors.white, 
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 20, 
-    borderRadius: globalStyles.cardRadius, 
-    marginBottom: 16 
+  emojiContainer: {
+    backgroundColor: colors.lightGray,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
   },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
-  cardText: { fontSize: 16, color: colors.darkGray, marginBottom: 4, lineHeight: 24 },
+  bigEmoji: { fontSize: 60 },
   
-  actionButton: { 
-    backgroundColor: colors.primary, 
-    padding: 16, 
-    borderRadius: globalStyles.buttonRadius, 
-    alignItems: 'center', 
-    marginTop: 10 
+  title: { fontSize: 24, fontWeight: 'bold', color: colors.black, textAlign: 'center', marginBottom: 12 },
+  subtitle: { fontSize: 16, color: colors.darkGray, textAlign: 'center', lineHeight: 24, paddingHorizontal: 20, marginBottom: 40 },
+  
+  statsContainer: { flexDirection: 'row', justifyContent: 'space-around', width: '100%' },
+  statBox: { alignItems: 'center' },
+  statText: { fontSize: 14, fontWeight: 'bold', color: colors.black, marginTop: 8 },
+  
+  footer: { padding: 20, paddingBottom: 40 },
+  startButton: {
+    backgroundColor: colors.primary,
+    padding: 18,
+    borderRadius: globalStyles.buttonRadius,
+    alignItems: 'center',
   },
-  actionButtonText: { color: colors.black, fontSize: 16, fontWeight: 'bold' }
+  startButtonText: { fontSize: 18, fontWeight: 'bold', color: colors.black }
 });
 
 export default Quiz;

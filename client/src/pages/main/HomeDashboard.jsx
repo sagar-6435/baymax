@@ -55,7 +55,7 @@ const HomeDashboard = ({ navigation }) => {
           <Text style={styles.gridIcon}>💊</Text>
           <Text style={styles.gridText}>MEDICINE</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.gridItem}>
+        <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('WellnessDashboard')}>
           <Text style={styles.gridIcon}>🧘</Text>
           <Text style={styles.gridText}>WELLNESS</Text>
         </TouchableOpacity>

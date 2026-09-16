@@ -1,81 +1,164 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 
-const QuizQuestion = ({ navigation }) => {
+const QuizQuestion = ({ navigation, route }) => {
+  const { title = "Quiz", questionIndex = 0 } = route.params || {};
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  const mockQuestions = [
+    {
+      question: "Which of the following is considered a macronutrient?",
+      options: ["Vitamin C", "Protein", "Iron", "Calcium"],
+      correct: 1
+    },
+    {
+      question: "How many liters of water should an average adult drink daily?",
+      options: ["1 Liter", "2-3 Liters", "5 Liters", "0.5 Liters"],
+      correct: 1
+    },
+    {
+      question: "Which organ is primarily responsible for pumping blood?",
+      options: ["Lungs", "Brain", "Heart", "Liver"],
+      correct: 2
+    }
+  ];
+
+  const currentQ = mockQuestions[questionIndex];
+
+  const handleNext = () => {
+    if (selectedOption === null) return;
+    
+    if (questionIndex < mockQuestions.length - 1) {
+      navigation.push('QuizQuestion', { title, questionIndex: questionIndex + 1 });
+    } else {
+      navigation.navigate('QuizResult', { score: 3, total: 3 });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
+          <Ionicons name="close" size={28} color={colors.black} />
         </TouchableOpacity>
-        <View style={{ width: 32 }} />
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${((questionIndex + 1) / mockQuestions.length) * 100}%` }]} />
+        </View>
       </View>
 
-      <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>MOCK DATA OVERVIEW</Text>
-        
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Information Details</Text>
-          <Text style={styles.cardText}>This is a placeholder page for QUIZ QUESTION. Here you would typically see relevant data fetched from the backend API.</Text>
-        </View>
+      <View style={styles.content}>
+        <Text style={styles.questionCounter}>QUESTION {questionIndex + 1} OF {mockQuestions.length}</Text>
+        <Text style={styles.questionText}>{currentQ.question}</Text>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recent Activity</Text>
-          <Text style={styles.cardText}>• Checked in at 9:00 AM</Text>
-          <Text style={styles.cardText}>• Updated preferences</Text>
-          <Text style={styles.cardText}>• Synced with wearable</Text>
+        <View style={styles.optionsContainer}>
+          {currentQ.options.map((opt, index) => {
+            const isSelected = selectedOption === index;
+            return (
+              <TouchableOpacity 
+                key={index} 
+                style={[styles.optionButton, isSelected && styles.optionSelected]}
+                onPress={() => setSelectedOption(index)}
+              >
+                <View style={[styles.radioCircle, isSelected && styles.radioSelected]}>
+                  {isSelected && <View style={styles.radioInner} />}
+                </View>
+                <Text style={styles.optionText}>{opt}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
+      </View>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Edit Details</Text>
+      <View style={styles.footer}>
+        <TouchableOpacity 
+          style={[styles.nextButton, selectedOption === null && styles.nextButtonDisabled]} 
+          onPress={handleNext}
+          disabled={selectedOption === null}
+        >
+          <Text style={styles.nextButtonText}>
+            {questionIndex < mockQuestions.length - 1 ? 'Next' : 'Finish'}
+          </Text>
         </TouchableOpacity>
-        
-        <View style={{ height: 40 }} />
-      </ScrollView>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    justifyContent: 'space-between', 
     paddingTop: 50, 
-    paddingBottom: 16, 
     paddingHorizontal: 20, 
     backgroundColor: colors.white,
-    borderBottomWidth: 1, 
-    borderBottomColor: colors.border 
   },
-  backButton: { padding: 4 },
-  title: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
+  backButton: { padding: 4, marginRight: 16 },
+  progressBar: {
+    flex: 1,
+    height: 8,
+    backgroundColor: colors.lightGray,
+    borderRadius: 4,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: colors.primary,
+    borderRadius: 4,
+  },
   
-  content: { padding: 20 },
-  sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
+  content: { flex: 1, padding: 24, paddingTop: 40 },
+  questionCounter: { fontSize: 12, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
+  questionText: { fontSize: 24, fontWeight: 'bold', color: colors.black, lineHeight: 32, marginBottom: 40 },
   
-  card: { 
-    backgroundColor: colors.white, 
+  optionsContainer: { flex: 1 },
+  optionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 20, 
-    borderRadius: globalStyles.cardRadius, 
-    marginBottom: 16 
+    padding: 20,
+    borderRadius: globalStyles.cardRadius,
+    marginBottom: 16,
   },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
-  cardText: { fontSize: 16, color: colors.darkGray, marginBottom: 4, lineHeight: 24 },
+  optionSelected: {
+    borderColor: colors.primary,
+    backgroundColor: '#fffde7',
+  },
+  radioCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  radioSelected: {
+    borderColor: colors.primary,
+  },
+  radioInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.primary,
+  },
+  optionText: { fontSize: 16, color: colors.black, flex: 1 },
   
-  actionButton: { 
-    backgroundColor: colors.primary, 
-    padding: 16, 
-    borderRadius: globalStyles.buttonRadius, 
-    alignItems: 'center', 
-    marginTop: 10 
+  footer: { padding: 20, paddingBottom: 40, borderTopWidth: 1, borderTopColor: colors.border },
+  nextButton: {
+    backgroundColor: colors.primary,
+    padding: 18,
+    borderRadius: globalStyles.buttonRadius,
+    alignItems: 'center',
   },
-  actionButtonText: { color: colors.black, fontSize: 16, fontWeight: 'bold' }
+  nextButtonDisabled: {
+    backgroundColor: colors.lightGray,
+  },
+  nextButtonText: { fontSize: 18, fontWeight: 'bold', color: colors.black }
 });
 
 export default QuizQuestion;

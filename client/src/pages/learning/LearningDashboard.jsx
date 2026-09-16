@@ -6,7 +6,10 @@ import { Ionicons } from '@expo/vector-icons';
 const LearningDashboard = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.progressCard}>
+      <TouchableOpacity 
+        style={styles.progressCard}
+        onPress={() => navigation.navigate('LearningProgress')}
+      >
         <View style={styles.progressHeader}>
           <Text style={styles.cardTitle}>Your Progress</Text>
           <Text style={styles.levelBadge}>LVL 3</Text>
@@ -16,11 +19,19 @@ const LearningDashboard = ({ navigation }) => {
           <View style={styles.progressBarFill}></View>
         </View>
         <Text style={styles.progressText}>75% to Level 4</Text>
-      </View>
+      </TouchableOpacity>
 
-      <Text style={styles.sectionTitle}>CATEGORIES</Text>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>CATEGORIES</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('LearningCategories')}>
+          <Text style={styles.seeAllText}>See All</Text>
+        </TouchableOpacity>
+      </View>
       
-      <TouchableOpacity style={styles.moduleCard}>
+      <TouchableOpacity 
+        style={styles.moduleCard}
+        onPress={() => navigation.navigate('AnatomyModule')}
+      >
         <View style={styles.moduleIconContainer}>
           <Text style={styles.moduleIcon}>🧠</Text>
         </View>
@@ -34,7 +45,10 @@ const LearningDashboard = ({ navigation }) => {
         <Ionicons name="chevron-forward" size={20} color={colors.darkGray} />
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.moduleCard}>
+      <TouchableOpacity 
+        style={styles.moduleCard}
+        onPress={() => navigation.navigate('NutritionModule')}
+      >
         <View style={styles.moduleIconContainer}>
           <Text style={styles.moduleIcon}>🥗</Text>
         </View>
@@ -48,6 +62,16 @@ const LearningDashboard = ({ navigation }) => {
         <Ionicons name="chevron-forward" size={20} color={colors.darkGray} />
       </TouchableOpacity>
 
+      <TouchableOpacity 
+        style={styles.achievementsCard}
+        onPress={() => navigation.navigate('AchievementsBadges')}
+      >
+        <Ionicons name="trophy" size={24} color={colors.primary} />
+        <Text style={styles.achievementsText}>View Achievements & Badges</Text>
+        <Ionicons name="arrow-forward" size={20} color={colors.black} />
+      </TouchableOpacity>
+
+      <View style={{height: 40}} />
     </ScrollView>
   );
 };
@@ -71,7 +95,9 @@ const styles = StyleSheet.create({
   progressBarFill: { width: '75%', height: '100%', backgroundColor: colors.black, borderRadius: 4 },
   progressText: { color: colors.darkGray, fontSize: 14, fontWeight: 'bold' },
   
-  sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1 },
+  seeAllText: { fontSize: 14, fontWeight: 'bold', color: colors.primary },
   
   moduleCard: { 
     flexDirection: 'row', 
@@ -90,7 +116,18 @@ const styles = StyleSheet.create({
   moduleSub: { fontSize: 14, color: colors.darkGray, marginBottom: 8 },
   
   smallProgressBar: { height: 4, backgroundColor: colors.lightGray, borderRadius: 2, width: '80%' },
-  smallProgressFill: { height: '100%', backgroundColor: colors.primary, borderRadius: 2 }
+  smallProgressFill: { height: '100%', backgroundColor: colors.primary, borderRadius: 2 },
+  
+  achievementsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.lightGray,
+    padding: 16,
+    borderRadius: globalStyles.cardRadius,
+    marginTop: 20,
+    marginBottom: 20
+  },
+  achievementsText: { flex: 1, fontSize: 16, fontWeight: 'bold', color: colors.black, marginLeft: 16 }
 });
 
 export default LearningDashboard;

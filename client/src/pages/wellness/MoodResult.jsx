@@ -1,81 +1,126 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 
-const MoodResult = ({ navigation }) => {
+const MoodResult = ({ route, navigation }) => {
+  const { mood } = route.params || { mood: { id: 3, emoji: '😐', label: 'Okay', color: '#fff9c4' } };
+
+  // Personalize suggestion based on mood id
+  let suggestionTitle = "Let's keep the balance.";
+  let suggestionText = "A quick breathing exercise might help you center yourself for the rest of the day.";
+  let actionRoute = "BreathingExercise";
+  let actionLabel = "Try 1-Minute Breathing";
+
+  if (mood.id <= 2) {
+    suggestionTitle = "It's okay to not be okay.";
+    suggestionText = "When you're feeling down or stressed, taking a few minutes to deeply relax can make a big difference.";
+    actionRoute = "RelaxationExercise";
+    actionLabel = "Start Relaxation";
+  } else if (mood.id >= 4) {
+    suggestionTitle = "Glad you're doing well!";
+    suggestionText = "Since you have good energy today, how about reviewing your recent activity goals?";
+    actionRoute = "ActivitySummary";
+    actionLabel = "View Activity";
+  }
+
   return (
     <View style={styles.container}>
+      <View style={[styles.colorBackground, { backgroundColor: mood.color }]} />
+      
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('WellnessDashboard')}>
+          <Ionicons name="close" size={28} color={colors.black} />
         </TouchableOpacity>
-        <View style={{ width: 32 }} />
       </View>
 
-      <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>MOCK DATA OVERVIEW</Text>
-        
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Information Details</Text>
-          <Text style={styles.cardText}>This is a placeholder page for MOOD RESULT. Here you would typically see relevant data fetched from the backend API.</Text>
+      <View style={styles.content}>
+        <View style={styles.resultCard}>
+          <Text style={styles.emoji}>{mood.emoji}</Text>
+          <Text style={styles.moodLabel}>You are feeling {mood.label}</Text>
+          <Text style={styles.loggedText}>Mood logged successfully</Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recent Activity</Text>
-          <Text style={styles.cardText}>• Checked in at 9:00 AM</Text>
-          <Text style={styles.cardText}>• Updated preferences</Text>
-          <Text style={styles.cardText}>• Synced with wearable</Text>
+        <View style={styles.suggestionBox}>
+          <Text style={styles.suggestionTitle}>{suggestionTitle}</Text>
+          <Text style={styles.suggestionText}>{suggestionText}</Text>
         </View>
+      </View>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Edit Details</Text>
+      <View style={styles.footer}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => navigation.navigate(actionRoute)}
+        >
+          <Text style={styles.actionButtonText}>{actionLabel}</Text>
         </TouchableOpacity>
         
-        <View style={{ height: 40 }} />
-      </ScrollView>
+        <TouchableOpacity 
+          style={styles.skipButton}
+          onPress={() => navigation.navigate('WellnessDashboard')}
+        >
+          <Text style={styles.skipButtonText}>Back to Dashboard</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
+  colorBackground: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0,
+    height: '45%',
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+  },
   header: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'space-between', 
     paddingTop: 50, 
-    paddingBottom: 16, 
     paddingHorizontal: 20, 
+    alignItems: 'flex-start',
+    zIndex: 10
+  },
+  backButton: { padding: 4, backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: 20 },
+  
+  content: { flex: 1, paddingHorizontal: 20, paddingTop: 60, alignItems: 'center' },
+  
+  resultCard: {
     backgroundColor: colors.white,
-    borderBottomWidth: 1, 
-    borderBottomColor: colors.border 
+    borderRadius: globalStyles.cardRadius,
+    padding: 30,
+    alignItems: 'center',
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+    marginBottom: 40
   },
-  backButton: { padding: 4 },
-  title: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
+  emoji: { fontSize: 72, marginBottom: 16 },
+  moodLabel: { fontSize: 24, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
+  loggedText: { fontSize: 14, color: colors.darkGray },
   
-  content: { padding: 20 },
-  sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
-  
-  card: { 
-    backgroundColor: colors.white, 
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 20, 
-    borderRadius: globalStyles.cardRadius, 
-    marginBottom: 16 
+  suggestionBox: {
+    padding: 20,
+    alignItems: 'center',
   },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
-  cardText: { fontSize: 16, color: colors.darkGray, marginBottom: 4, lineHeight: 24 },
+  suggestionTitle: { fontSize: 20, fontWeight: 'bold', color: colors.black, marginBottom: 12, textAlign: 'center' },
+  suggestionText: { fontSize: 16, color: colors.darkGray, textAlign: 'center', lineHeight: 24 },
   
-  actionButton: { 
-    backgroundColor: colors.primary, 
-    padding: 16, 
-    borderRadius: globalStyles.buttonRadius, 
-    alignItems: 'center', 
-    marginTop: 10 
+  footer: { padding: 20, paddingBottom: 40 },
+  actionButton: {
+    backgroundColor: colors.black,
+    paddingVertical: 18,
+    borderRadius: globalStyles.buttonRadius,
+    alignItems: 'center',
+    marginBottom: 16
   },
-  actionButtonText: { color: colors.black, fontSize: 16, fontWeight: 'bold' }
+  actionButtonText: { color: colors.white, fontSize: 16, fontWeight: 'bold' },
+  
+  skipButton: { alignItems: 'center', paddingVertical: 10 },
+  skipButtonText: { color: colors.darkGray, fontSize: 16, fontWeight: '600' }
 });
 
 export default MoodResult;

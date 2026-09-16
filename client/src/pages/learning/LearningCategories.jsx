@@ -10,28 +10,68 @@ const LearningCategories = ({ navigation }) => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={colors.black} />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>ALL MODULES</Text>
         <View style={{ width: 32 }} />
       </View>
 
-      <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>MOCK DATA OVERVIEW</Text>
-        
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Information Details</Text>
-          <Text style={styles.cardText}>This is a placeholder page for LEARNING CATEGORIES. Here you would typically see relevant data fetched from the backend API.</Text>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.grid}>
+          <TouchableOpacity 
+            style={styles.gridCard}
+            onPress={() => navigation.navigate('AnatomyModule')}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#e3f2fd' }]}>
+              <Text style={styles.iconText}>🧠</Text>
+            </View>
+            <Text style={styles.cardTitle}>Human Anatomy</Text>
+            <Text style={styles.cardSub}>Understand your body</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.gridCard}
+            onPress={() => navigation.navigate('NutritionModule')}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#e8f5e9' }]}>
+              <Text style={styles.iconText}>🥗</Text>
+            </View>
+            <Text style={styles.cardTitle}>Nutrition Basics</Text>
+            <Text style={styles.cardSub}>Healthy eating habits</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.gridCard}
+            onPress={() => navigation.navigate('DiseaseModule')}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#ffebee' }]}>
+              <Text style={styles.iconText}>🦠</Text>
+            </View>
+            <Text style={styles.cardTitle}>Disease Prevention</Text>
+            <Text style={styles.cardSub}>Stay healthy & safe</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.gridCard}
+            onPress={() => navigation.navigate('FirstAidLearningModule')}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#fff3e0' }]}>
+              <Text style={styles.iconText}>🩹</Text>
+            </View>
+            <Text style={styles.cardTitle}>First Aid Essentials</Text>
+            <Text style={styles.cardSub}>Emergency response</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.gridCard}
+            onPress={() => navigation.navigate('MedicationSafetyModule')}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#f3e5f5' }]}>
+              <Text style={styles.iconText}>💊</Text>
+            </View>
+            <Text style={styles.cardTitle}>Medication Safety</Text>
+            <Text style={styles.cardSub}>Proper use & care</Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recent Activity</Text>
-          <Text style={styles.cardText}>• Checked in at 9:00 AM</Text>
-          <Text style={styles.cardText}>• Updated preferences</Text>
-          <Text style={styles.cardText}>• Synced with wearable</Text>
-        </View>
-
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Edit Details</Text>
-        </TouchableOpacity>
-        
         <View style={{ height: 40 }} />
       </ScrollView>
     </View>
@@ -39,7 +79,7 @@ const LearningCategories = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -51,31 +91,33 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, 
     borderBottomColor: colors.border 
   },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
   backButton: { padding: 4 },
-  title: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
   
   content: { padding: 20 },
-  sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
   
-  card: { 
-    backgroundColor: colors.white, 
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  gridCard: {
+    width: '48%',
+    backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 20, 
-    borderRadius: globalStyles.cardRadius, 
-    marginBottom: 16 
+    borderRadius: globalStyles.cardRadius,
+    padding: 16,
+    marginBottom: 16,
+    alignItems: 'center'
   },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
-  cardText: { fontSize: 16, color: colors.darkGray, marginBottom: 4, lineHeight: 24 },
-  
-  actionButton: { 
-    backgroundColor: colors.primary, 
-    padding: 16, 
-    borderRadius: globalStyles.buttonRadius, 
-    alignItems: 'center', 
-    marginTop: 10 
+  iconBox: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12
   },
-  actionButtonText: { color: colors.black, fontSize: 16, fontWeight: 'bold' }
+  iconText: { fontSize: 32 },
+  cardTitle: { fontSize: 16, fontWeight: 'bold', color: colors.black, textAlign: 'center', marginBottom: 4 },
+  cardSub: { fontSize: 12, color: colors.darkGray, textAlign: 'center' }
 });
 
 export default LearningCategories;
