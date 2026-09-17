@@ -1,16 +1,24 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 import { generateLlmResponseStream } from '../../services/llmService';
 
-const AiHealthAssistant = ({ navigation }) => {
+const AiHealthAssistant = ({ route, navigation }) => {
   const [messages, setMessages] = useState([
     { id: '1', role: 'bot', text: 'Hello! I am Baymax, your personal healthcare companion. How can I assist you today?' }
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollViewRef = useRef();
+
+  useEffect(() => {
+    if (route.params?.voiceText) {
+      setInputText(route.params.voiceText);
+      // Clear the param so it doesn't stay there forever
+      navigation.setParams({ voiceText: undefined });
+    }
+  }, [route.params?.voiceText]);
 
   const suggestions = [
     "I have a headache",
