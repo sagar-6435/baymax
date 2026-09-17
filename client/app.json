@@ -26,7 +26,7 @@
     },
     "plugins": [
       [
-        "@react-native-voice/voice",
+        "expo-speech-recognition",
         {
           "microphonePermission": "Allow BayMax to access your microphone for voice typing.",
           "speechRecognitionPermission": "Allow BayMax to access speech recognition for voice typing."

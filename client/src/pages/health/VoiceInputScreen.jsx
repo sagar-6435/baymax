@@ -1,64 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, globalStyles } from '../../theme';
-import Voice from '@react-native-voice/voice';
+import { colors } from '../../theme';
+import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 
 const VoiceInputScreen = ({ navigation }) => {
   const [isListening, setIsListening] = useState(false);
   const [recognizedText, setRecognizedText] = useState('');
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // Setup Voice listeners
-    Voice.onSpeechStart = onSpeechStart;
-    Voice.onSpeechEnd = onSpeechEnd;
-    Voice.onSpeechError = onSpeechError;
-    Voice.onSpeechResults = onSpeechResults;
-
-    return () => {
-      // Clean up listeners when component unmounts
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  const onSpeechStart = (e) => {
-    setIsListening(true);
-    setError(null);
-  };
-
-  const onSpeechEnd = (e) => {
+  // Listen to speech results
+  useSpeechRecognitionEvent("start", () => setIsListening(true));
+  useSpeechRecognitionEvent("end", () => setIsListening(false));
+  useSpeechRecognitionEvent("error", (event) => {
     setIsListening(false);
-  };
-
-  const onSpeechError = (e) => {
-    setIsListening(false);
-    setError(e.error?.message || 'Error occurred during speech recognition');
-  };
-
-  const onSpeechResults = (e) => {
-    if (e.value && e.value.length > 0) {
-      setRecognizedText(e.value[0]);
+    setError(event.error || 'Error occurred during speech recognition');
+  });
+  useSpeechRecognitionEvent("result", (event) => {
+    if (event.results && event.results.length > 0) {
+      setRecognizedText(event.results[0].transcript);
     }
-  };
+  });
 
   const startListening = async () => {
     try {
+      const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      if (!granted) {
+        setError('Microphone permission denied');
+        return;
+      }
       setRecognizedText('');
       setError(null);
-      await Voice.start('en-US');
+      ExpoSpeechRecognitionModule.start({ lang: "en-US", interimResults: true });
     } catch (e) {
       console.error(e);
       setError('Failed to start recording');
     }
   };
 
-  const stopListening = async () => {
-    try {
-      await Voice.stop();
-    } catch (e) {
-      console.error(e);
-    }
+  const stopListening = () => {
+    ExpoSpeechRecognitionModule.stop();
   };
 
   const toggleListening = () => {
@@ -71,9 +52,8 @@ const VoiceInputScreen = ({ navigation }) => {
 
   const submitText = () => {
     if (recognizedText.trim()) {
-      // Pass the text back to the previous screen via params
       navigation.navigate({
-        name: 'AiHealthAssistant', // Assuming this is the name of the chat screen
+        name: 'AiHealthAssistant',
         params: { voiceText: recognizedText },
         merge: true,
       });
@@ -81,6 +61,15 @@ const VoiceInputScreen = ({ navigation }) => {
       navigation.goBack();
     }
   };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (isListening) {
+        ExpoSpeechRecognitionModule.stop();
+      }
+    };
+  }, [isListening]);
 
   return (
     <View style={styles.container}>
