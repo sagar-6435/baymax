@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,13 +31,7 @@ const ReviewAnswers = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>REVIEW ANSWERS</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <ScrollView style={styles.content}>
         
@@ -70,7 +65,7 @@ const ReviewAnswers = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -103,7 +98,7 @@ const styles = StyleSheet.create({
   correctAnswerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, backgroundColor: '#f0fdf4', padding: 8, borderRadius: 8 },
   correctAnswerText: { fontSize: 14, color: '#166534', marginLeft: 8, fontWeight: 'bold' },
   
-  explanationBox: { marginTop: 12, backgroundColor: colors.lightGray, padding: 12, borderRadius: 8 },
+  explanationBox: { marginTop: 12, backgroundColor: colors.white, padding: 12, borderRadius: 8 },
   explanationTitle: { fontSize: 12, fontWeight: 'bold', color: colors.darkGray, marginBottom: 4, textTransform: 'uppercase' },
   explanationText: { fontSize: 14, color: colors.darkGray, lineHeight: 20 }
 });

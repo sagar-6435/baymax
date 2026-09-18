@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,15 +18,7 @@ const EditMedicineReminder = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>EDIT REMINDER</Text>
-        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-          <Ionicons name="trash-outline" size={24} color="#d32f2f" />
-        </TouchableOpacity>
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <ScrollView style={styles.content}>
         
@@ -108,7 +101,7 @@ const styles = StyleSheet.create({
   inputBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     borderRadius: globalStyles.cardRadius,
     paddingHorizontal: 16,
     height: 56,
@@ -120,7 +113,7 @@ const styles = StyleSheet.create({
   
   timeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 30 },
   timeSelect: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 20,
@@ -132,7 +125,7 @@ const styles = StyleSheet.create({
   
   freqRow: { flexDirection: 'row', gap: 12 },
   freqBtn: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 20,

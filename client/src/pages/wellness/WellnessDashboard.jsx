@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,13 +7,7 @@ import { colors, globalStyles } from '../../theme';
 const WellnessDashboard = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>WELLNESS</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.greetingSection}>
@@ -133,7 +128,7 @@ const styles = StyleSheet.create({
   moodHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black, marginBottom: 4 },
   cardSub: { fontSize: 14, color: colors.darkGray },
-  iconCircle: { width: 50, height: 50, borderRadius: 25, backgroundColor: colors.lightGray, justifyContent: 'center', alignItems: 'center' },
+  iconCircle: { width: 50, height: 50, borderRadius: 25, backgroundColor: colors.white, justifyContent: 'center', alignItems: 'center' },
   emojiIcon: { fontSize: 24 },
   
   sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
@@ -164,7 +159,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     borderRadius: globalStyles.cardRadius,
     padding: 16,
     marginTop: 10

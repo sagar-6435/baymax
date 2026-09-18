@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,13 +14,7 @@ const WellnessHistory = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>HISTORY</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         
@@ -89,7 +84,7 @@ const styles = StyleSheet.create({
   content: { padding: 20 },
   
   summaryCard: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     borderRadius: globalStyles.cardRadius,
     padding: 20,
     marginBottom: 30,
@@ -112,7 +107,7 @@ const styles = StyleSheet.create({
     top: 24,
     bottom: -24,
     width: 2,
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
   },
   timelineDot: {
     width: 16,

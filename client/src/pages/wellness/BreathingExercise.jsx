@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -85,16 +86,7 @@ const BreathingExercise = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => {
-          setIsActive(false);
-          navigation.goBack();
-        }}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>BREATHING</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <View style={styles.content}>
         

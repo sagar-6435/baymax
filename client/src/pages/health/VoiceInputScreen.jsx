@@ -2,7 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme';
-import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
+import AppHeader from '../../components/AppHeader';
+let ExpoSpeechRecognitionModule = null;
+let useSpeechRecognitionEvent = () => {};
+
+try {
+  const SpeechRec = require('expo-speech-recognition');
+  ExpoSpeechRecognitionModule = SpeechRec.ExpoSpeechRecognitionModule;
+  useSpeechRecognitionEvent = SpeechRec.useSpeechRecognitionEvent;
+} catch (e) {
+  console.warn("ExpoSpeechRecognitionModule native module not found. Mocking for Expo Go.");
+}
 
 const VoiceInputScreen = ({ navigation }) => {
   const [isListening, setIsListening] = useState(false);
@@ -10,20 +20,30 @@ const VoiceInputScreen = ({ navigation }) => {
   const [error, setError] = useState(null);
 
   // Listen to speech results
-  useSpeechRecognitionEvent("start", () => setIsListening(true));
-  useSpeechRecognitionEvent("end", () => setIsListening(false));
-  useSpeechRecognitionEvent("error", (event) => {
-    setIsListening(false);
-    setError(event.error || 'Error occurred during speech recognition');
-  });
-  useSpeechRecognitionEvent("result", (event) => {
-    if (event.results && event.results.length > 0) {
-      setRecognizedText(event.results[0].transcript);
-    }
-  });
+  if (useSpeechRecognitionEvent) {
+    useSpeechRecognitionEvent("start", () => setIsListening(true));
+    useSpeechRecognitionEvent("end", () => setIsListening(false));
+    useSpeechRecognitionEvent("error", (event) => {
+      setIsListening(false);
+      setError(event.error || 'Error occurred during speech recognition');
+    });
+    useSpeechRecognitionEvent("result", (event) => {
+      if (event.results && event.results.length > 0) {
+        setRecognizedText(event.results[0].transcript);
+      }
+    });
+  }
 
   const startListening = async () => {
     try {
+      if (!ExpoSpeechRecognitionModule) {
+        setIsListening(true);
+        setTimeout(() => {
+          setIsListening(false);
+          setRecognizedText('Hello Baymax, my head hurts.');
+        }, 2500);
+        return;
+      }
       const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
       if (!granted) {
         setError('Microphone permission denied');
@@ -39,6 +59,10 @@ const VoiceInputScreen = ({ navigation }) => {
   };
 
   const stopListening = () => {
+    if (!ExpoSpeechRecognitionModule) {
+      setIsListening(false);
+      return;
+    }
     ExpoSpeechRecognitionModule.stop();
   };
 
@@ -65,7 +89,7 @@ const VoiceInputScreen = ({ navigation }) => {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (isListening) {
+      if (isListening && ExpoSpeechRecognitionModule) {
         ExpoSpeechRecognitionModule.stop();
       }
     };
@@ -73,15 +97,7 @@ const VoiceInputScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={28} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.title}>Voice Input</Text>
-        <TouchableOpacity onPress={submitText} disabled={!recognizedText}>
-          <Text style={[styles.doneText, !recognizedText && { color: colors.gray }]}>Done</Text>
-        </TouchableOpacity>
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <View style={styles.content}>
         <View style={styles.textContainer}>

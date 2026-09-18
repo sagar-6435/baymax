@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -56,13 +57,7 @@ const Settings = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>SETTINGS</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.sectionTitle}>PREFERENCES</Text>
@@ -113,7 +108,7 @@ const Settings = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -181,7 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
   },
   settingLabel: { fontSize: 16, fontWeight: '600', color: colors.black },
   settingDesc: { fontSize: 12, color: colors.darkGray, marginTop: 2 },

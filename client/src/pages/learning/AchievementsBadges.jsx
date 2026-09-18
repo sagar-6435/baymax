@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,13 +20,7 @@ const AchievementsBadges = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>ACHIEVEMENTS</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <ScrollView style={styles.content}>
         
@@ -120,7 +115,7 @@ const styles = StyleSheet.create({
     borderColor: '#00bcd4',
   },
   badgeLockedBox: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     borderColor: colors.border,
   },
   badgeEmoji: { fontSize: 32 },

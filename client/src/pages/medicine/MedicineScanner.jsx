@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -38,14 +39,7 @@ const MedicineScanner = ({ navigation }) => {
       <CameraView style={styles.camera} facing="back">
         <View style={styles.overlay}>
           {/* Top Bar */}
-          <View style={styles.header}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Ionicons name="close" size={32} color={colors.white} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.flashButton}>
-              <Ionicons name="flash-outline" size={28} color={colors.white} />
-            </TouchableOpacity>
-          </View>
+          <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
           {/* Scanner Reticle */}
           <View style={styles.reticleContainer}>

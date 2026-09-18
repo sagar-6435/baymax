@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -37,14 +38,7 @@ const InteractiveLesson = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={28} color={colors.black} />
-        </TouchableOpacity>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${((currentCard + 1) / cards.length) * 100}%` }]} />
-        </View>
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <View style={styles.content}>
         <View style={styles.cardContainer}>
@@ -79,7 +73,7 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 8,
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     borderRadius: 4,
   },
   progressFill: {

@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,13 +9,7 @@ const LessonDetails = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>LESSON INFO</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <ScrollView style={styles.content}>
         
@@ -94,7 +89,7 @@ const styles = StyleSheet.create({
   content: { padding: 20 },
   
   heroCard: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     padding: 24,
     borderRadius: globalStyles.cardRadius,
     alignItems: 'center',

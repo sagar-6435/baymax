@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -44,13 +45,7 @@ const MedicineLearningQuiz = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>SAFETY QUIZ</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <View style={styles.content}>
         {showResult ? (
@@ -127,7 +122,7 @@ const MedicineLearningQuiz = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 

@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,12 +26,7 @@ const LoginScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
         {/* Header Section */}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={28} color={colors.black} />
-          </TouchableOpacity>
-          <Text style={styles.brandTitle}>BayMax</Text>
-        </View>
+        <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
         {/* Welcome Text */}
         <View style={styles.welcomeSection}>
@@ -128,7 +124,7 @@ const styles = StyleSheet.create({
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 14, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
   inputWrapper: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: colors.lightGray,
+    flexDirection: 'row', alignItems: 'center', backgroundColor: colors.white,
     borderRadius: globalStyles.cardRadius, borderWidth: 1, borderColor: colors.border,
     paddingHorizontal: 16, height: 56
   },

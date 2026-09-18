@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -72,15 +73,7 @@ const AiHealthAssistant = ({ route, navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>AI HEALTH</Text>
-        <TouchableOpacity style={styles.moreButton}>
-          <Ionicons name="ellipsis-vertical" size={24} color={colors.black} />
-        </TouchableOpacity>
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
       
       <ScrollView 
         style={styles.chatArea}
@@ -234,13 +227,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: Platform.OS === 'ios' ? 30 : 16
   },
-  micButton: { marginRight: 12, backgroundColor: colors.lightGray, padding: 12, borderRadius: 24 },
+  micButton: { marginRight: 12, backgroundColor: colors.white, padding: 12, borderRadius: 24 },
   textInputContainer: { 
     flex: 1, 
     flexDirection: 'row',
     alignItems: 'center',
     height: 50, 
-    backgroundColor: colors.lightGray, 
+    backgroundColor: colors.white, 
     borderRadius: 25, 
     paddingHorizontal: 20 
   },

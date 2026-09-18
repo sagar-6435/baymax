@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,14 +40,7 @@ const QuizQuestion = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={28} color={colors.black} />
-        </TouchableOpacity>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${((questionIndex + 1) / mockQuestions.length) * 100}%` }]} />
-        </View>
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <View style={styles.content}>
         <Text style={styles.questionCounter}>QUESTION {questionIndex + 1} OF {mockQuestions.length}</Text>
@@ -99,7 +93,7 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 8,
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     borderRadius: 4,
   },
   progressFill: {
@@ -156,7 +150,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   nextButtonDisabled: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
   },
   nextButtonText: { fontSize: 18, fontWeight: 'bold', color: colors.black }
 });

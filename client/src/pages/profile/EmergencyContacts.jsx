@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -38,13 +39,7 @@ const EmergencyContacts = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>EMERGENCY CONTACTS</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <ScrollView style={styles.content}>
         <View style={styles.warningBanner}>
@@ -130,7 +125,7 @@ const EmergencyContacts = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
   header: { 
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
     paddingTop: 50, paddingBottom: 16, paddingHorizontal: 20, 
@@ -162,7 +157,7 @@ const styles = StyleSheet.create({
   
   contactActions: { flexDirection: 'row' },
   actionIcon: {
-    width: 36, height: 36, borderRadius: 18, backgroundColor: colors.lightGray,
+    width: 36, height: 36, borderRadius: 18, backgroundColor: colors.white,
     justifyContent: 'center', alignItems: 'center', marginLeft: 10
   },
 
@@ -182,7 +177,7 @@ const styles = StyleSheet.create({
   inputGroup: { marginBottom: 16 },
   inputLabel: { fontSize: 14, color: colors.darkGray, marginBottom: 8 },
   textInput: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,

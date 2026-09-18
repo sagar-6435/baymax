@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,11 +29,7 @@ const MoodResult = ({ route, navigation }) => {
     <View style={styles.container}>
       <View style={[styles.colorBackground, { backgroundColor: mood.color }]} />
       
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('WellnessDashboard')}>
-          <Ionicons name="close" size={28} color={colors.black} />
-        </TouchableOpacity>
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <View style={styles.content}>
         <View style={styles.resultCard}>

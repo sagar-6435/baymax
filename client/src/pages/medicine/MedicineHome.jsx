@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,15 +7,7 @@ import { colors, globalStyles } from '../../theme';
 const MedicineHome = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>MEDICINE HUB</Text>
-        <TouchableOpacity style={styles.moreButton}>
-          <Ionicons name="search" size={24} color={colors.black} />
-        </TouchableOpacity>
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         
@@ -165,7 +158,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   reminderTimeBox: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     padding: 12,
     borderRadius: 12,
     alignItems: 'center',
@@ -191,7 +184,7 @@ const styles = StyleSheet.create({
     width: 120,
   },
   cabinetIconBox: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     width: 60,
     height: 60,
     borderRadius: 30,
@@ -204,7 +197,7 @@ const styles = StyleSheet.create({
   learningBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     borderRadius: globalStyles.cardRadius,
     padding: 20,
     marginBottom: 20,

@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,11 +9,7 @@ const Quiz = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={28} color={colors.black} />
-        </TouchableOpacity>
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <View style={styles.content}>
         <View style={styles.emojiContainer}>
@@ -60,7 +57,7 @@ const styles = StyleSheet.create({
   content: { flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center' },
   
   emojiContainer: {
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     width: 120,
     height: 120,
     borderRadius: 60,

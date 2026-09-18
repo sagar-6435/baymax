@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,13 +18,7 @@ const CameraScanResult = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>SCAN RESULT</Text>
-        <View style={{ width: 32 }} />
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <View style={styles.content}>
         {analyzing ? (
@@ -74,7 +69,7 @@ const CameraScanResult = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.lightGray },
+  container: { flex: 1, backgroundColor: colors.white },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -121,7 +116,7 @@ const styles = StyleSheet.create({
   medIconBox: {
     width: 80, height: 80,
     borderRadius: 40,
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16

@@ -1,3 +1,4 @@
+import AppHeader from '../../components/AppHeader';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,15 +9,7 @@ const MedicineDetails = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.black} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>DETAILS</Text>
-        <TouchableOpacity style={styles.favoriteButton}>
-          <Ionicons name="heart-outline" size={24} color={colors.black} />
-        </TouchableOpacity>
-      </View>
+      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         
@@ -137,7 +130,7 @@ const styles = StyleSheet.create({
   medIconBox: {
     width: 100, height: 100,
     borderRadius: 50,
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16
@@ -145,7 +138,7 @@ const styles = StyleSheet.create({
   medName: { fontSize: 24, fontWeight: 'bold', color: colors.black, marginBottom: 4 },
   medGeneric: { fontSize: 16, color: colors.darkGray, marginBottom: 12 },
   tagContainer: { flexDirection: 'row', gap: 8 },
-  tag: { backgroundColor: colors.lightGray, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+  tag: { backgroundColor: colors.white, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
   tagText: { fontSize: 12, fontWeight: 'bold', color: colors.darkGray },
   
   statsRow: {
