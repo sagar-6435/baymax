@@ -4,6 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { notificationService } from '../../services/notificationService';
+import { getLearningDataForCondition } from '../../data/learningData';
+import { generateLlmResponse } from '../../services/llmService';
+import { userService } from '../../services/userService';
 
 const { width } = Dimensions.get('window');
 
@@ -18,6 +21,64 @@ const HomeDashboard = ({ navigation }) => {
   useEffect(() => {
     // Generate daily alerts if applicable
     notificationService.generateDailyMedicationAlerts(user, updateUser);
+
+    const generateLessonsInBackground = async () => {
+      if (!user || !user.health?.chronicConditions) return;
+      
+      const generatedLessons = user.generatedLessons || [];
+      const updatedLessons = [...generatedLessons];
+      let hasNewLessons = false;
+
+      for (const condition of user.health.chronicConditions) {
+        const data = getLearningDataForCondition(condition);
+        if (!data || !data.lessons) continue;
+
+        for (const lesson of data.lessons) {
+          // Check if lesson already generated
+          const exists = updatedLessons.find(
+            l => l.condition === condition && l.title === lesson.title
+          );
+          
+          if (!exists) {
+            try {
+              console.log(`Generating lesson for ${condition}: ${lesson.title}`);
+              const prompt = `Generate an educational health lesson about "${lesson.title}" for a patient with "${condition}". Output MUST be valid JSON with a "content" string. Do not include markdown \`\`\` wrappers, just valid JSON like: {"content": "Your lesson text here. Use \\n\\n for paragraphs."}`;
+              const response = await generateLlmResponse(prompt);
+              
+              let cleanResponse = response.trim();
+              if (cleanResponse.startsWith('\`\`\`json')) cleanResponse = cleanResponse.substring(7);
+              else if (cleanResponse.startsWith('\`\`\`')) cleanResponse = cleanResponse.substring(3);
+              if (cleanResponse.endsWith('\`\`\`')) cleanResponse = cleanResponse.substring(0, cleanResponse.length - 3);
+              
+              const parsed = JSON.parse(cleanResponse);
+              
+              if (parsed.content) {
+                updatedLessons.push({
+                  condition,
+                  title: lesson.title,
+                  content: parsed.content
+                });
+                hasNewLessons = true;
+                console.log(`Successfully generated lesson: ${lesson.title}`);
+              }
+            } catch (err) {
+              console.log(`Failed to generate lesson ${lesson.title}`, err);
+            }
+          }
+        }
+      }
+
+      if (hasNewLessons) {
+        try {
+          const updatedUser = await userService.updateProfile({ generatedLessons: updatedLessons });
+          await updateUser(updatedUser);
+        } catch (e) {
+          console.log("Failed to save generated lessons to profile");
+        }
+      }
+    };
+
+    generateLessonsInBackground();
 
     const hour = new Date().getHours();
     if (hour < 12) setGreeting({ text: 'Good\nMorning', icon: '☀️' });

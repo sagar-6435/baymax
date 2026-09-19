@@ -1,9 +1,9 @@
 import AppHeader from '../../components/AppHeader';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, ActivityIndicator, Alert, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
-import { getLessonByTitle } from '../../data/learningData';
+import { generateLlmResponse } from '../../services/llmService';
 
 const { width } = Dimensions.get('window');
 
@@ -11,6 +11,7 @@ const InteractiveLesson = ({ navigation, route }) => {
   const lessonTitle = route?.params?.title || "Interactive Lesson";
   const lessonData = route?.params?.lessonData;
   const [currentCard, setCurrentCard] = useState(0);
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
 
   const rawContent = lessonData ? lessonData.content : "Content not found.";
   
@@ -27,11 +28,55 @@ const InteractiveLesson = ({ navigation, route }) => {
     cards.push({ emoji: '🤷', title: 'Empty', content: 'No content available.' });
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentCard < cards.length - 1) {
       setCurrentCard(currentCard + 1);
     } else {
-      navigation.navigate('Quiz', { title: lessonTitle, lessonData });
+      setIsGeneratingQuiz(true);
+      try {
+        const prompt = `Based on the following lesson content, generate a 5-10 question multiple-choice quiz.
+Output MUST be valid JSON with NO markdown blocks around it. Do not include \`\`\`json.
+The JSON must have this exact structure:
+{
+  "quiz": [
+    {
+      "question": "A multiple choice question about the content",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "answerIndex": 0
+    }
+  ]
+}
+IMPORTANT: The quiz array MUST contain between 5 and 10 questions.
+Lesson Content:
+${rawContent}`;
+        
+        const response = await generateLlmResponse(prompt);
+        let parsedData;
+        try {
+          let cleanResponse = response.trim();
+          if (cleanResponse.startsWith('```json')) cleanResponse = cleanResponse.substring(7);
+          else if (cleanResponse.startsWith('```')) cleanResponse = cleanResponse.substring(3);
+          if (cleanResponse.endsWith('```')) cleanResponse = cleanResponse.substring(0, cleanResponse.length - 3);
+          
+          parsedData = JSON.parse(cleanResponse);
+        } catch (parseError) {
+          console.error("Failed to parse LLM response:", response);
+          Alert.alert("Error", "Baymax got a bit confused generating the quiz. Please try again!");
+          setIsGeneratingQuiz(false);
+          return;
+        }
+
+        setIsGeneratingQuiz(false);
+        // Combine the existing lesson data with the new quiz array
+        navigation.navigate('Quiz', { 
+          title: lessonTitle, 
+          lessonData: { ...lessonData, quiz: parsedData.quiz } 
+        });
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Error", "Could not generate quiz at this time.");
+        setIsGeneratingQuiz(false);
+      }
     }
   };
 
@@ -54,6 +99,16 @@ const InteractiveLesson = ({ navigation, route }) => {
           </Text>
         </TouchableOpacity>
       </View>
+
+      {isGeneratingQuiz && (
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingCard}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={styles.loadingTitle}>Baymax is thinking...</Text>
+            <Text style={styles.loadingSub}>Generating your personalized 5-10 question quiz.</Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -108,6 +163,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   nextButtonText: { fontSize: 18, fontWeight: 'bold', color: colors.black },
+  loadingOverlay: {
+    position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    justifyContent: 'center', alignItems: 'center',
+    zIndex: 100,
+  },
+  loadingCard: {
+    backgroundColor: colors.white,
+    padding: 30,
+    borderRadius: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+    maxWidth: '80%',
+  },
+  loadingTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black, marginTop: 16, marginBottom: 8, textAlign: 'center' },
+  loadingSub: { fontSize: 14, color: colors.darkGray, textAlign: 'center', lineHeight: 20 },
 });
 
 export default InteractiveLesson;

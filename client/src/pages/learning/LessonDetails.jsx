@@ -4,13 +4,13 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 import { getLessonByTitle } from '../../data/learningData';
-import { generateLlmResponse } from '../../services/llmService';
+import { useAuth } from '../../context/AuthContext';
 
 const LessonDetails = ({ navigation, route }) => {
   const lessonTitle = route?.params?.title || "Lesson Overview";
   const lesson = getLessonByTitle(lessonTitle);
-  const [isGenerating, setIsGenerating] = useState(false);
-
+  const { user } = useAuth();
+  
   if (!lesson) {
     return (
       <View style={styles.container}>
@@ -23,55 +23,18 @@ const LessonDetails = ({ navigation, route }) => {
   }
 
   const handleStartLesson = async () => {
-    setIsGenerating(true);
-    try {
-      const prompt = `Generate an educational health lesson about "${lessonTitle}". 
-Output MUST be valid JSON with NO markdown blocks around it. Do not include \`\`\`json. 
-The JSON must have this exact structure:
-{
-  "content": "A detailed educational text about the topic. Use \\n\\n to separate paragraphs.",
-  "quiz": [
-    {
-      "question": "A multiple choice question about the content",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "answerIndex": 0
-    }
-  ]
-}
-IMPORTANT: The quiz array MUST contain between 5 and 10 questions.`;
-      
-      const response = await generateLlmResponse(prompt);
-      
-      // Try to parse the JSON
-      let parsedData;
-      try {
-        // Strip out markdown code blocks if the LLM still wraps it
-        let cleanResponse = response.trim();
-        if (cleanResponse.startsWith('\`\`\`json')) {
-          cleanResponse = cleanResponse.substring(7);
-        } else if (cleanResponse.startsWith('\`\`\`')) {
-          cleanResponse = cleanResponse.substring(3);
-        }
-        if (cleanResponse.endsWith('\`\`\`')) {
-          cleanResponse = cleanResponse.substring(0, cleanResponse.length - 3);
-        }
-        parsedData = JSON.parse(cleanResponse);
-      } catch (parseError) {
-        console.error("Failed to parse LLM response:", response);
-        Alert.alert("Error", "Baymax got a bit confused generating the lesson. Please try again!");
-        setIsGenerating(false);
-        return;
-      }
-
-      setIsGenerating(false);
+    const generated = user?.generatedLessons?.find(l => l.title === lessonTitle);
+    
+    if (generated && generated.content) {
       navigation.navigate('InteractiveLesson', { 
         title: lessonTitle, 
-        lessonData: parsedData 
+        lessonData: generated 
       });
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Could not generate lesson at this time.");
-      setIsGenerating(false);
+    } else {
+      Alert.alert(
+        "Preparing Lesson", 
+        "Baymax is currently writing this personalized lesson for you in the background. Please try again in a few moments!"
+      );
     }
   };
 
@@ -117,16 +80,6 @@ IMPORTANT: The quiz array MUST contain between 5 and 10 questions.`;
 
         <View style={{ height: 100 }} />
       </ScrollView>
-
-      {isGenerating ? (
-        <View style={styles.loadingOverlay}>
-          <View style={styles.loadingCard}>
-            <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.loadingTitle}>Baymax is preparing...</Text>
-            <Text style={styles.loadingSub}>Generating your personalized lesson and a 5-10 question quiz.</Text>
-          </View>
-        </View>
-      ) : null}
 
       <View style={styles.footer}>
         <TouchableOpacity 

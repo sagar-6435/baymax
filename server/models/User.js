@@ -80,6 +80,13 @@ const userSchema = new mongoose.Schema(
         text: { type: String, required: true },
         timestamp: { type: Date, default: Date.now }
       }
+    ],
+    generatedLessons: [
+      {
+        condition: { type: String },
+        title: { type: String },
+        content: { type: String }
+      }
     ]
   },
   {
