@@ -7,15 +7,14 @@ import { getLessonByTitle } from '../../data/learningData';
 const { width } = Dimensions.get('window');
 
 const QuizResult = ({ navigation, route }) => {
-  const { title, userAnswers = [] } = route?.params || {};
+  const { title, lessonData, userAnswers = [] } = route?.params || {};
   
-  const lesson = getLessonByTitle(title);
-  const questions = lesson?.quiz || [];
+  const questions = lessonData?.quiz || [];
   const total = questions.length;
   
-  // Perfectly evaluate score
+  // Evaluate score using answerIndex
   const score = userAnswers.reduce((acc, ans, index) => {
-    return acc + (ans === questions[index].correct ? 1 : 0);
+    return acc + (ans === questions[index].answerIndex ? 1 : 0);
   }, 0);
 
   const isPerfect = score === total && total > 0;
@@ -50,7 +49,7 @@ const QuizResult = ({ navigation, route }) => {
       <View style={styles.footer}>
         <TouchableOpacity 
           style={styles.outlineButton} 
-          onPress={() => navigation.navigate('ReviewAnswers', { title, userAnswers })}
+          onPress={() => navigation.navigate('ReviewAnswers', { title, lessonData, userAnswers })}
         >
           <Text style={styles.outlineButtonText}>Review Answers</Text>
         </TouchableOpacity>

@@ -9,10 +9,10 @@ const { width } = Dimensions.get('window');
 
 const InteractiveLesson = ({ navigation, route }) => {
   const lessonTitle = route?.params?.title || "Interactive Lesson";
+  const lessonData = route?.params?.lessonData;
   const [currentCard, setCurrentCard] = useState(0);
 
-  const lesson = getLessonByTitle(lessonTitle);
-  const rawContent = lesson ? lesson.content : "Content not found.";
+  const rawContent = lessonData ? lessonData.content : "Content not found.";
   
   // Split content into paragraphs for interactive cards
   const paragraphs = rawContent.split('\n\n').filter(p => p.trim() !== '');
@@ -31,7 +31,7 @@ const InteractiveLesson = ({ navigation, route }) => {
     if (currentCard < cards.length - 1) {
       setCurrentCard(currentCard + 1);
     } else {
-      navigation.navigate('Quiz', { title: lessonTitle });
+      navigation.navigate('Quiz', { title: lessonTitle, lessonData });
     }
   };
 

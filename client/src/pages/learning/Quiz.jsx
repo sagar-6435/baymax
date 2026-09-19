@@ -6,9 +6,8 @@ import { colors, globalStyles } from '../../theme';
 import { getLessonByTitle } from '../../data/learningData';
 
 const Quiz = ({ navigation, route }) => {
-  const title = route?.params?.title || "Health Quiz";
-  const lesson = getLessonByTitle(title);
-  const numQuestions = lesson?.quiz?.length || 3;
+  const { title = "Health Quiz", lessonData } = route?.params || {};
+  const numQuestions = lessonData?.quiz?.length || 0;
 
   return (
     <View style={styles.container}>
@@ -37,7 +36,7 @@ const Quiz = ({ navigation, route }) => {
       <View style={styles.footer}>
         <TouchableOpacity 
           style={styles.startButton} 
-          onPress={() => navigation.navigate('QuizQuestion', { title, questionIndex: 0, userAnswers: [] })}
+          onPress={() => navigation.navigate('QuizQuestion', { title, lessonData, questionIndex: 0, userAnswers: [] })}
         >
           <Text style={styles.startButtonText}>Let's Go!</Text>
         </TouchableOpacity>

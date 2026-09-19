@@ -1,6 +1,6 @@
 import AppHeader from '../../components/AppHeader';
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { colors, globalStyles } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 
@@ -48,31 +48,31 @@ const ChatHistory = ({ navigation }) => {
             <Text style={styles.emptySub}>Start a conversation with Baymax to see your history here.</Text>
           </View>
         ) : (
-          Object.keys(groupedMessages).map((date) => (
-            <View key={date} style={styles.dateGroup}>
-              <View style={styles.dateHeader}>
-                <Text style={styles.dateText}>{date}</Text>
-              </View>
-              
-              {groupedMessages[date].map((msg) => (
-                <View key={msg.id} style={msg.role === 'bot' ? styles.botMessageWrapper : styles.userMessageWrapper}>
-                  {msg.role === 'bot' && (
-                    <View style={styles.botTitleContainer}>
-                      <Text style={styles.botTitle}>BAYMAX</Text>
-                    </View>
-                  )}
-                  <View style={msg.role === 'bot' ? styles.botMessageCard : styles.userMessage}>
-                    <Text style={msg.role === 'bot' ? styles.messageTextBot : styles.messageTextUser}>
-                      {msg.text}
-                    </Text>
+          Object.keys(groupedMessages).map((date) => {
+            const messages = groupedMessages[date];
+            const firstUserMessage = messages.find(m => m.role === 'user')?.text || 'Chat Session';
+            const sessionTime = formatTime(messages[0]?.timestamp);
+            
+            return (
+              <TouchableOpacity 
+                key={date} 
+                style={styles.chatSessionCard}
+                onPress={() => navigation.navigate('DetailedChatHistory', { date, messages })}
+                activeOpacity={0.7}
+              >
+                <View style={styles.chatSessionLeft}>
+                  <View style={styles.iconCircle}>
+                    <Text style={styles.iconEmoji}>🤖</Text>
                   </View>
-                  <Text style={[styles.timeText, msg.role === 'user' ? { alignSelf: 'flex-end', marginRight: 8 } : { marginLeft: 8 }]}>
-                    {formatTime(msg.timestamp)}
-                  </Text>
+                  <View style={styles.sessionTextContainer}>
+                    <Text style={styles.sessionTitle} numberOfLines={1}>{firstUserMessage}</Text>
+                    <Text style={styles.sessionTime}>{date} • {sessionTime}</Text>
+                  </View>
                 </View>
-              ))}
-            </View>
-          ))
+                <Text style={styles.arrow}>❯</Text>
+              </TouchableOpacity>
+            );
+          })
         )}
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 24, fontWeight: 'bold', color: colors.black, marginBottom: 4 },
   headerSub: { fontSize: 14, color: colors.darkGray },
   
-  historyList: { flex: 1, padding: 16 },
+  historyList: { flex: 1, padding: 20 },
   
   emptyContainer: {
     alignItems: 'center',
@@ -106,45 +106,53 @@ const styles = StyleSheet.create({
   emptyTitle: { fontSize: 20, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
   emptySub: { fontSize: 14, color: colors.darkGray, textAlign: 'center', lineHeight: 22 },
 
-  dateGroup: { marginBottom: 24 },
-  dateHeader: { alignItems: 'center', marginBottom: 16 },
-  dateText: { 
-    fontSize: 12, 
-    fontWeight: 'bold', 
-    color: colors.darkGray, 
+  chatSessionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.white,
+    padding: 16,
+    borderRadius: globalStyles.cardRadius,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 16,
+  },
+  chatSessionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 16,
+  },
+  iconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: colors.lightGray,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    overflow: 'hidden'
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
   },
-  
-  botMessageWrapper: { marginBottom: 16 },
-  userMessageWrapper: { marginBottom: 16 },
-  
-  botTitleContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 4, marginLeft: 4 },
-  botTitle: { fontSize: 12, fontWeight: 'bold', color: colors.darkGray },
-  
-  botMessageCard: { 
-    backgroundColor: '#f3f4f6', 
-    padding: 16, 
-    borderRadius: 20,
-    borderBottomLeftRadius: 4,
-    maxWidth: '85%', 
-    alignSelf: 'flex-start' 
+  iconEmoji: {
+    fontSize: 24,
   },
-  userMessage: { 
-    backgroundColor: colors.primary, 
-    padding: 16, 
-    borderRadius: 20, 
-    borderBottomRightRadius: 4,
-    maxWidth: '85%', 
-    alignSelf: 'flex-end' 
+  sessionTextContainer: {
+    flex: 1,
   },
-  messageTextBot: { fontSize: 16, color: colors.black, lineHeight: 24 },
-  messageTextUser: { fontSize: 16, color: colors.black, lineHeight: 24 },
-  
-  timeText: { fontSize: 10, color: colors.darkGray, marginTop: 4 },
+  sessionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.black,
+    marginBottom: 4,
+  },
+  sessionTime: {
+    fontSize: 14,
+    color: colors.darkGray,
+  },
+  arrow: {
+    fontSize: 20,
+    color: colors.border,
+    fontWeight: 'bold',
+  }
 });
 
 export default ChatHistory;

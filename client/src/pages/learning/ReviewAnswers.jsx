@@ -6,10 +6,9 @@ import { colors, globalStyles } from '../../theme';
 import { getLessonByTitle } from '../../data/learningData';
 
 const ReviewAnswers = ({ navigation, route }) => {
-  const { title, userAnswers = [] } = route?.params || {};
+  const { title, lessonData, userAnswers = [] } = route?.params || {};
   
-  const lesson = getLessonByTitle(title);
-  const questions = lesson?.quiz || [];
+  const questions = lessonData?.quiz || [];
 
   return (
     <View style={styles.container}>
@@ -19,9 +18,9 @@ const ReviewAnswers = ({ navigation, route }) => {
         
         {questions.map((item, index) => {
           const uAnsIdx = userAnswers[index];
-          const isCorrect = uAnsIdx === item.correct;
+          const isCorrect = uAnsIdx === item.answerIndex;
           const userStr = item.options[uAnsIdx] || "No Answer";
-          const correctStr = item.options[item.correct];
+          const correctStr = item.options[item.answerIndex];
 
           return (
             <View key={index} style={styles.reviewCard}>
@@ -39,10 +38,12 @@ const ReviewAnswers = ({ navigation, route }) => {
                 </View>
               )}
 
-              <View style={styles.explanationBox}>
-                <Text style={styles.explanationTitle}>Explanation</Text>
-                <Text style={styles.explanationText}>{item.explanation}</Text>
-              </View>
+              {item.explanation && (
+                <View style={styles.explanationBox}>
+                  <Text style={styles.explanationTitle}>Explanation</Text>
+                  <Text style={styles.explanationText}>{item.explanation}</Text>
+                </View>
+              )}
             </View>
           );
         })}

@@ -6,10 +6,9 @@ import { colors, globalStyles } from '../../theme';
 import { getLessonByTitle } from '../../data/learningData';
 
 const QuizQuestion = ({ navigation, route }) => {
-  const { title, questionIndex = 0, userAnswers = [] } = route?.params || {};
+  const { title, lessonData, questionIndex = 0, userAnswers = [] } = route?.params || {};
   
-  const lesson = getLessonByTitle(title);
-  const questions = lesson?.quiz || [];
+  const questions = lessonData?.quiz || [];
   
   const currentQ = questions[questionIndex];
   
@@ -34,12 +33,14 @@ const QuizQuestion = ({ navigation, route }) => {
     if (questionIndex < questions.length - 1) {
       navigation.push('QuizQuestion', { 
         title, 
+        lessonData,
         questionIndex: questionIndex + 1,
         userAnswers: newAnswers 
       });
     } else {
       navigation.navigate('QuizResult', { 
-        title, 
+        title,
+        lessonData,
         userAnswers: newAnswers 
       });
     }
