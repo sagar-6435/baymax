@@ -1,21 +1,48 @@
 import AppHeader from '../../components/AppHeader';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 import PrimaryButton from '../../components/PrimaryButton';
 import { useAuth } from '../../context/AuthContext';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+
+WebBrowser.maybeCompleteAuthSession();
 
 const SignupScreen = ({ navigation }) => {
-  const { completeOnboarding } = useAuth();
+  const { register, googleLogin } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignup = () => {
-    // Prototype: Immediately grant access
-    completeOnboarding();
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    clientId: '633852806467-5oj5f8ki310usa88j5qg753e67dspqum.apps.googleusercontent.com',
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      googleLogin(id_token).catch(err => {
+        console.error('Google signup failed:', err);
+        alert(err.message || 'Failed to sign up with Google');
+      });
+    }
+  }, [response]);
+
+  const handleGoogleLogin = () => {
+    promptAsync();
+  };
+
+  const handleSignup = async () => {
+    try {
+      await register(name, email, password, phone);
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert(error.message || 'Failed to sign up');
+    }
   };
 
   return (
@@ -51,7 +78,22 @@ const SignupScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address</Text>
+            <Text style={styles.label}>Mobile Number</Text>
+            <View style={styles.inputWrapper}>
+              <Ionicons name="call-outline" size={20} color={colors.darkGray} style={styles.inputIcon} />
+              <TextInput 
+                style={styles.input}
+                placeholder="Enter your mobile number"
+                placeholderTextColor={colors.darkGray}
+                keyboardType="phone-pad"
+                value={phone}
+                onChangeText={setPhone}
+              />
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email Address (Optional)</Text>
             <View style={styles.inputWrapper}>
               <Ionicons name="mail-outline" size={20} color={colors.darkGray} style={styles.inputIcon} />
               <TextInput 
@@ -61,7 +103,7 @@ const SignupScreen = ({ navigation }) => {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(text) => setEmail(text.toLowerCase())}
               />
             </View>
           </View>
@@ -86,24 +128,6 @@ const SignupScreen = ({ navigation }) => {
 
           <View style={{ marginTop: 10 }}>
             <PrimaryButton title="Create Account" onPress={handleSignup} />
-          </View>
-        </View>
-
-        {/* Social Login */}
-        <View style={styles.socialSection}>
-          <View style={styles.dividerRow}>
-            <View style={styles.divider} />
-            <Text style={styles.dividerText}>OR SIGN UP WITH</Text>
-            <View style={styles.divider} />
-          </View>
-
-          <View style={styles.socialButtonsRow}>
-            <TouchableOpacity style={styles.socialButton}>
-              <Ionicons name="logo-google" size={24} color={colors.black} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <Ionicons name="logo-apple" size={24} color={colors.black} />
-            </TouchableOpacity>
           </View>
         </View>
 

@@ -1,33 +1,15 @@
 import AppHeader from '../../components/AppHeader';
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
+import { getLessonByTitle } from '../../data/learningData';
 
-const ReviewAnswers = ({ navigation }) => {
-  const mockReviews = [
-    {
-      question: "Which of the following is considered a macronutrient?",
-      yourAnswer: "Protein",
-      correctAnswer: "Protein",
-      isCorrect: true,
-      explanation: "Proteins, carbohydrates, and fats are the three main macronutrients essential for the body."
-    },
-    {
-      question: "How many liters of water should an average adult drink daily?",
-      yourAnswer: "2-3 Liters",
-      correctAnswer: "2-3 Liters",
-      isCorrect: true,
-      explanation: "The U.S. National Academies of Sciences, Engineering, and Medicine determined that an adequate daily fluid intake is about 2.7 to 3.7 liters."
-    },
-    {
-      question: "Which organ is primarily responsible for pumping blood?",
-      yourAnswer: "Lungs",
-      correctAnswer: "Heart",
-      isCorrect: false,
-      explanation: "The heart pumps blood throughout the body, while the lungs are responsible for oxygenating the blood."
-    }
-  ];
+const ReviewAnswers = ({ navigation, route }) => {
+  const { title, userAnswers = [] } = route?.params || {};
+  
+  const lesson = getLessonByTitle(title);
+  const questions = lesson?.quiz || [];
 
   return (
     <View style={styles.container}>
@@ -35,28 +17,35 @@ const ReviewAnswers = ({ navigation }) => {
 
       <ScrollView style={styles.content}>
         
-        {mockReviews.map((item, index) => (
-          <View key={index} style={styles.reviewCard}>
-            <Text style={styles.questionText}>{index + 1}. {item.question}</Text>
-            
-            <View style={styles.answerRow}>
-              <Ionicons name={item.isCorrect ? "checkmark-circle" : "close-circle"} size={20} color={item.isCorrect ? colors.primary : colors.error || 'red'} />
-              <Text style={styles.yourAnswerText}>Your Answer: {item.yourAnswer}</Text>
-            </View>
+        {questions.map((item, index) => {
+          const uAnsIdx = userAnswers[index];
+          const isCorrect = uAnsIdx === item.correct;
+          const userStr = item.options[uAnsIdx] || "No Answer";
+          const correctStr = item.options[item.correct];
 
-            {!item.isCorrect && (
-              <View style={styles.correctAnswerRow}>
-                <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
-                <Text style={styles.correctAnswerText}>Correct Answer: {item.correctAnswer}</Text>
+          return (
+            <View key={index} style={styles.reviewCard}>
+              <Text style={styles.questionText}>{index + 1}. {item.question}</Text>
+              
+              <View style={styles.answerRow}>
+                <Ionicons name={isCorrect ? "checkmark-circle" : "close-circle"} size={20} color={isCorrect ? colors.primary : colors.error || 'red'} />
+                <Text style={styles.yourAnswerText}>Your Answer: {userStr}</Text>
               </View>
-            )}
 
-            <View style={styles.explanationBox}>
-              <Text style={styles.explanationTitle}>Explanation</Text>
-              <Text style={styles.explanationText}>{item.explanation}</Text>
+              {!isCorrect && (
+                <View style={styles.correctAnswerRow}>
+                  <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                  <Text style={styles.correctAnswerText}>Correct Answer: {correctStr}</Text>
+                </View>
+              )}
+
+              <View style={styles.explanationBox}>
+                <Text style={styles.explanationTitle}>Explanation</Text>
+                <Text style={styles.explanationText}>{item.explanation}</Text>
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -98,7 +87,7 @@ const styles = StyleSheet.create({
   correctAnswerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, backgroundColor: '#f0fdf4', padding: 8, borderRadius: 8 },
   correctAnswerText: { fontSize: 14, color: '#166534', marginLeft: 8, fontWeight: 'bold' },
   
-  explanationBox: { marginTop: 12, backgroundColor: colors.white, padding: 12, borderRadius: 8 },
+  explanationBox: { marginTop: 12, backgroundColor: colors.lightGray, padding: 12, borderRadius: 8 },
   explanationTitle: { fontSize: 12, fontWeight: 'bold', color: colors.darkGray, marginBottom: 4, textTransform: 'uppercase' },
   explanationText: { fontSize: 14, color: colors.darkGray, lineHeight: 20 }
 });

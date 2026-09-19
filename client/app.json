@@ -12,14 +12,12 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/baymax_robot.jpg"
       },
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.sagar889.baymax"
+      "package": "com.baymax.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,7 +38,8 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {

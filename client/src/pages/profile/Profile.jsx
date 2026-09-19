@@ -1,17 +1,39 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
+import { useAuth } from '../../context/AuthContext';
 
 const Profile = ({ navigation }) => {
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      { 
+        text: 'Sign Out', 
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await logout();
+          } catch (error) {
+            console.error('Logout error:', error);
+          }
+        }
+      }
+    ]);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
         <View style={styles.avatarMock}>
-          <Text style={styles.avatarText}>AM</Text>
+          <Text style={styles.avatarText}>
+            {user?.name ? user.name.charAt(0).toUpperCase() : 'B'}
+          </Text>
         </View>
-        <Text style={styles.name}>Alex Mercer</Text>
-        <Text style={styles.email}>alex@example.com</Text>
+        <Text style={styles.name}>{user?.name || 'Guest User'}</Text>
+        <Text style={styles.email}>{user?.email || 'No email provided'}</Text>
       </View>
 
       <View style={styles.section}>
@@ -25,7 +47,7 @@ const Profile = ({ navigation }) => {
           <View style={styles.divider} />
           <TouchableOpacity style={styles.listItem} onPress={() => navigation.navigate('HealthPreferences')}>
             <Ionicons name="heart-outline" size={20} color={colors.darkGray} style={styles.listIcon} />
-            <Text style={styles.listText}>Health Preferences</Text>
+            <Text style={styles.listText}>Health Details</Text>
             <Ionicons name="chevron-forward" size={20} color={colors.border} />
           </TouchableOpacity>
           <View style={styles.divider} />
@@ -52,6 +74,13 @@ const Profile = ({ navigation }) => {
             <Ionicons name="chevron-forward" size={20} color={colors.border} />
           </TouchableOpacity>
         </View>
+      </View>
+
+      <View style={styles.section}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={20} color={colors.error || '#FF3B30'} style={styles.listIcon} />
+          <Text style={styles.logoutText}>Sign Out</Text>
+        </TouchableOpacity>
       </View>
       
       <View style={{height: 40}} />
@@ -80,7 +109,24 @@ const styles = StyleSheet.create({
   listItem: { flexDirection: 'row', alignItems: 'center', padding: 16 },
   listIcon: { marginRight: 16 },
   listText: { flex: 1, fontSize: 16, color: colors.black, fontWeight: '500' },
-  divider: { height: 1, backgroundColor: colors.border, marginLeft: 52 }
+  divider: { height: 1, backgroundColor: colors.border, marginLeft: 52 },
+  logoutButton: {
+    backgroundColor: colors.white,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: globalStyles.cardRadius,
+    borderWidth: 1,
+    borderColor: colors.error || '#FF3B30',
+    marginTop: 10
+  },
+  logoutText: {
+    fontSize: 16,
+    color: colors.error || '#FF3B30',
+    fontWeight: 'bold',
+    marginLeft: 8
+  }
 });
 
 export default Profile;

@@ -2,12 +2,23 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
+import { getLessonByTitle } from '../../data/learningData';
 
 const { width } = Dimensions.get('window');
 
 const QuizResult = ({ navigation, route }) => {
-  const { score = 3, total = 3 } = route.params || {};
-  const isPerfect = score === total;
+  const { title, userAnswers = [] } = route?.params || {};
+  
+  const lesson = getLessonByTitle(title);
+  const questions = lesson?.quiz || [];
+  const total = questions.length;
+  
+  // Perfectly evaluate score
+  const score = userAnswers.reduce((acc, ans, index) => {
+    return acc + (ans === questions[index].correct ? 1 : 0);
+  }, 0);
+
+  const isPerfect = score === total && total > 0;
 
   return (
     <View style={styles.container}>
@@ -39,7 +50,7 @@ const QuizResult = ({ navigation, route }) => {
       <View style={styles.footer}>
         <TouchableOpacity 
           style={styles.outlineButton} 
-          onPress={() => navigation.navigate('ReviewAnswers')}
+          onPress={() => navigation.navigate('ReviewAnswers', { title, userAnswers })}
         >
           <Text style={styles.outlineButtonText}>Review Answers</Text>
         </TouchableOpacity>

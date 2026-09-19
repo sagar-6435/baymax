@@ -1,21 +1,87 @@
 import AppHeader from '../../components/AppHeader';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 import PrimaryButton from '../../components/PrimaryButton';
 import { useAuth } from '../../context/AuthContext';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+
+WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = ({ navigation }) => {
-  const { completeOnboarding } = useAuth();
-  const [email, setEmail] = useState('');
+  const { login, googleLogin } = useAuth();
+  const [mobileOrEmail, setMobileOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  const handleLogin = () => {
-    // In a real app, you would authenticate here.
-    // For the prototype, we immediately grant access.
-    completeOnboarding();
+  /* TEMPORARILY REMOVED GOOGLE SIGN-IN
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    clientId: '633852806467-5oj5f8ki310usa88j5qg753e67dspqum.apps.googleusercontent.com',
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      googleLogin(id_token).catch(err => {
+        console.error('Google login failed:', err);
+        alert(err.message || 'Failed to sign in with Google');
+      });
+    }
+  }, [response]);
+
+  const handleGoogleLogin = () => {
+    promptAsync();
+  };
+  */
+
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      setErrors({});
+
+      // Validation
+      if (!mobileOrEmail.trim()) {
+        setErrors({ mobileOrEmail: 'Mobile number or email is required' });
+        setLoading(false);
+        return;
+      }
+
+      if (!password.trim()) {
+        setErrors({ password: 'Password is required' });
+        setLoading(false);
+        return;
+      }
+
+      // Determine if input is email or mobile
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const mobileRegex = /^[0-9]{10,}$/; // Accepts 10 or more digits
+      
+      const isEmail = emailRegex.test(mobileOrEmail);
+      const isMobile = mobileRegex.test(mobileOrEmail.replace(/\D/g, ''));
+
+      if (!isEmail && !isMobile) {
+        setErrors({ mobileOrEmail: 'Please enter a valid email address or mobile number' });
+        setLoading(false);
+        return;
+      }
+
+      const loginData = {
+        [isEmail ? 'email' : 'mobile']: mobileOrEmail,
+        password: password
+      };
+
+      await login(mobileOrEmail, password);
+    } catch (error) {
+      console.error('Login error:', error);
+      setErrors({ submit: error.message || 'Failed to login. Please try again.' });
+      alert(error.message || 'Failed to login');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,19 +103,20 @@ const LoginScreen = ({ navigation }) => {
         {/* Form */}
         <View style={styles.formContainer}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address</Text>
+            <Text style={styles.label}>Mobile Number or Email</Text>
             <View style={styles.inputWrapper}>
               <Ionicons name="mail-outline" size={20} color={colors.darkGray} style={styles.inputIcon} />
               <TextInput 
                 style={styles.input}
-                placeholder="Enter your email"
+                placeholder="Enter your email or mobile number"
                 placeholderTextColor={colors.darkGray}
-                keyboardType="email-address"
+                keyboardType="default"
                 autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
+                value={mobileOrEmail}
+                onChangeText={(text) => setMobileOrEmail(text.toLowerCase())}
               />
             </View>
+            {errors.mobileOrEmail && <Text style={styles.errorText}>{errors.mobileOrEmail}</Text>}
           </View>
 
           <View style={styles.inputGroup}>
@@ -68,16 +135,20 @@ const LoginScreen = ({ navigation }) => {
                 <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color={colors.darkGray} />
               </TouchableOpacity>
             </View>
+            {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
           </View>
+
+          {errors.submit && <Text style={styles.errorText}>{errors.submit}</Text>}
 
           <TouchableOpacity style={styles.forgotPassword}>
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
 
-          <PrimaryButton title="Sign In" onPress={handleLogin} />
+          <PrimaryButton title={loading ? "Signing In..." : "Sign In"} onPress={handleLogin} disabled={loading} />
         </View>
 
-        {/* Social Login */}
+        {/* Social Login (Temporarily Removed) */}
+        {/* 
         <View style={styles.socialSection}>
           <View style={styles.dividerRow}>
             <View style={styles.divider} />
@@ -86,7 +157,7 @@ const LoginScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.socialButtonsRow}>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin}>
               <Ionicons name="logo-google" size={24} color={colors.black} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.socialButton}>
@@ -94,6 +165,7 @@ const LoginScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+        */}
 
         {/* Footer */}
         <View style={styles.footer}>
@@ -131,6 +203,7 @@ const styles = StyleSheet.create({
   inputIcon: { marginRight: 12 },
   input: { flex: 1, fontSize: 16, color: colors.black },
   eyeIcon: { padding: 8 },
+  errorText: { color: colors.error || '#E74C3C', fontSize: 12, marginTop: 6, fontWeight: '500' },
   
   forgotPassword: { alignSelf: 'flex-end', marginBottom: 24 },
   forgotPasswordText: { color: colors.black, fontWeight: 'bold', fontSize: 14 },

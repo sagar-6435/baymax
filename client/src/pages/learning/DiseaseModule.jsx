@@ -3,8 +3,12 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
+import { getLearningDataForCondition } from '../../data/learningData';
 
-const DiseaseModule = ({ navigation }) => {
+const DiseaseModule = ({ navigation, route }) => {
+  const { condition } = route?.params || {};
+  const data = getLearningDataForCondition(condition);
+
   return (
     <View style={styles.container}>
       <AppHeader showBack={true} onBack={() => navigation.goBack()} />
@@ -12,45 +16,29 @@ const DiseaseModule = ({ navigation }) => {
       <ScrollView style={styles.content}>
         
         <View style={styles.heroCard}>
-          <Text style={styles.heroEmoji}>🦠</Text>
-          <Text style={styles.heroTitle}>Stay Healthy & Safe</Text>
-          <Text style={styles.heroSub}>Understand common diseases, symptoms, and how to protect yourself.</Text>
+          <Text style={styles.heroEmoji}>{data.emoji}</Text>
+          <Text style={styles.heroTitle}>{data.title}</Text>
+          <Text style={styles.heroSub}>{data.subtitle}</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>LESSONS (0/3 COMPLETED)</Text>
+        <Text style={styles.sectionTitle}>LESSONS (0/{data.lessons.length} COMPLETED)</Text>
 
-        <TouchableOpacity style={[styles.lessonCard, { borderColor: colors.primary, borderWidth: 2 }]} onPress={() => navigation.navigate('LessonDetails', { title: 'Understanding Viruses' })}>
-          <View style={styles.lessonIconBox}>
-            <Text style={styles.lessonIcon}>🤧</Text>
-          </View>
-          <View style={styles.lessonInfo}>
-            <Text style={styles.lessonTitle}>Understanding Viruses</Text>
-            <Text style={styles.lessonTime}>12 mins • Up Next</Text>
-          </View>
-          <Ionicons name="play-circle" size={28} color={colors.primary} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.lessonCard} onPress={() => navigation.navigate('LessonDetails', { title: 'Hygiene Best Practices' })}>
-          <View style={styles.lessonIconBox}>
-            <Text style={styles.lessonIcon}>🧼</Text>
-          </View>
-          <View style={styles.lessonInfo}>
-            <Text style={styles.lessonTitle}>Hygiene Best Practices</Text>
-            <Text style={styles.lessonTime}>8 mins • Locked</Text>
-          </View>
-          <Ionicons name="lock-closed" size={20} color={colors.border} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.lessonCard} onPress={() => navigation.navigate('LessonDetails', { title: 'Immune System Basics' })}>
-          <View style={styles.lessonIconBox}>
-            <Text style={styles.lessonIcon}>🛡️</Text>
-          </View>
-          <View style={styles.lessonInfo}>
-            <Text style={styles.lessonTitle}>Immune System Basics</Text>
-            <Text style={styles.lessonTime}>15 mins • Locked</Text>
-          </View>
-          <Ionicons name="lock-closed" size={20} color={colors.border} />
-        </TouchableOpacity>
+        {data.lessons.map((lesson, index) => (
+          <TouchableOpacity 
+            key={index}
+            style={[styles.lessonCard, index === 0 ? { borderColor: colors.primary, borderWidth: 2 } : {}]} 
+            onPress={() => navigation.navigate('LessonDetails', { title: lesson.title })}
+          >
+            <View style={styles.lessonIconBox}>
+              <Text style={styles.lessonIcon}>{lesson.icon}</Text>
+            </View>
+            <View style={styles.lessonInfo}>
+              <Text style={styles.lessonTitle}>{lesson.title}</Text>
+              <Text style={styles.lessonTime}>{lesson.time} • {index === 0 ? 'Up Next' : 'Available'}</Text>
+            </View>
+            <Ionicons name="play-circle" size={index === 0 ? 28 : 24} color={index === 0 ? colors.primary : colors.darkGray} />
+          </TouchableOpacity>
+        ))}
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -84,7 +72,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   heroEmoji: { fontSize: 48, marginBottom: 12 },
-  heroTitle: { fontSize: 20, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
+  heroTitle: { fontSize: 20, fontWeight: 'bold', color: colors.black, marginBottom: 8, textAlign: 'center' },
   heroSub: { fontSize: 14, color: colors.darkGray, textAlign: 'center', lineHeight: 20 },
 
   sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
@@ -103,7 +91,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: colors.white,
+    backgroundColor: colors.lightGray,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,

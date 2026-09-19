@@ -3,38 +3,45 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
+import { getLessonByTitle } from '../../data/learningData';
 
 const QuizQuestion = ({ navigation, route }) => {
-  const { title = "Quiz", questionIndex = 0 } = route.params || {};
+  const { title, questionIndex = 0, userAnswers = [] } = route?.params || {};
+  
+  const lesson = getLessonByTitle(title);
+  const questions = lesson?.quiz || [];
+  
+  const currentQ = questions[questionIndex];
+  
   const [selectedOption, setSelectedOption] = useState(null);
 
-  const mockQuestions = [
-    {
-      question: "Which of the following is considered a macronutrient?",
-      options: ["Vitamin C", "Protein", "Iron", "Calcium"],
-      correct: 1
-    },
-    {
-      question: "How many liters of water should an average adult drink daily?",
-      options: ["1 Liter", "2-3 Liters", "5 Liters", "0.5 Liters"],
-      correct: 1
-    },
-    {
-      question: "Which organ is primarily responsible for pumping blood?",
-      options: ["Lungs", "Brain", "Heart", "Liver"],
-      correct: 2
-    }
-  ];
-
-  const currentQ = mockQuestions[questionIndex];
+  if (!currentQ) {
+    return (
+      <View style={styles.container}>
+        <AppHeader showBack={true} onBack={() => navigation.goBack()} />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>Question not found.</Text>
+        </View>
+      </View>
+    );
+  }
 
   const handleNext = () => {
     if (selectedOption === null) return;
     
-    if (questionIndex < mockQuestions.length - 1) {
-      navigation.push('QuizQuestion', { title, questionIndex: questionIndex + 1 });
+    const newAnswers = [...userAnswers, selectedOption];
+
+    if (questionIndex < questions.length - 1) {
+      navigation.push('QuizQuestion', { 
+        title, 
+        questionIndex: questionIndex + 1,
+        userAnswers: newAnswers 
+      });
     } else {
-      navigation.navigate('QuizResult', { score: 3, total: 3 });
+      navigation.navigate('QuizResult', { 
+        title, 
+        userAnswers: newAnswers 
+      });
     }
   };
 
@@ -42,23 +49,29 @@ const QuizQuestion = ({ navigation, route }) => {
     <View style={styles.container}>
       <AppHeader showBack={true} onBack={() => navigation.goBack()} />
 
+      <View style={styles.progressBarContainer}>
+        <View style={[styles.progressBarFill, { width: `${((questionIndex + 1) / questions.length) * 100}%` }]} />
+      </View>
+
       <View style={styles.content}>
-        <Text style={styles.questionCounter}>QUESTION {questionIndex + 1} OF {mockQuestions.length}</Text>
+        <Text style={styles.questionCounter}>QUESTION {questionIndex + 1} OF {questions.length}</Text>
         <Text style={styles.questionText}>{currentQ.question}</Text>
 
         <View style={styles.optionsContainer}>
-          {currentQ.options.map((opt, index) => {
+          {currentQ.options.map((option, index) => {
             const isSelected = selectedOption === index;
             return (
-              <TouchableOpacity 
-                key={index} 
-                style={[styles.optionButton, isSelected && styles.optionSelected]}
+              <TouchableOpacity
+                key={index}
+                style={[styles.optionCard, isSelected && styles.optionCardSelected]}
                 onPress={() => setSelectedOption(index)}
               >
-                <View style={[styles.radioCircle, isSelected && styles.radioSelected]}>
-                  {isSelected && <View style={styles.radioInner} />}
+                <View style={[styles.radioCircle, isSelected && styles.radioCircleSelected]}>
+                  {isSelected && <View style={styles.radioDot} />}
                 </View>
-                <Text style={styles.optionText}>{opt}</Text>
+                <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                  {option}
+                </Text>
               </TouchableOpacity>
             );
           })}
@@ -72,7 +85,7 @@ const QuizQuestion = ({ navigation, route }) => {
           disabled={selectedOption === null}
         >
           <Text style={styles.nextButtonText}>
-            {questionIndex < mockQuestions.length - 1 ? 'Next' : 'Finish'}
+            {questionIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -85,64 +98,69 @@ const styles = StyleSheet.create({
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
+    justifyContent: 'space-between', 
     paddingTop: 50, 
+    paddingBottom: 16, 
     paddingHorizontal: 20, 
     backgroundColor: colors.white,
   },
-  backButton: { padding: 4, marginRight: 16 },
-  progressBar: {
-    flex: 1,
-    height: 8,
-    backgroundColor: colors.white,
-    borderRadius: 4,
+  
+  progressBarContainer: {
+    height: 4,
+    backgroundColor: colors.lightGray,
+    width: '100%',
   },
-  progressFill: {
+  progressBarFill: {
     height: '100%',
     backgroundColor: colors.primary,
-    borderRadius: 4,
   },
   
-  content: { flex: 1, padding: 24, paddingTop: 40 },
-  questionCounter: { fontSize: 12, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
-  questionText: { fontSize: 24, fontWeight: 'bold', color: colors.black, lineHeight: 32, marginBottom: 40 },
+  content: { flex: 1, padding: 20 },
   
-  optionsContainer: { flex: 1 },
-  optionButton: {
+  questionCounter: { fontSize: 12, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
+  questionText: { fontSize: 22, fontWeight: 'bold', color: colors.black, lineHeight: 32, marginBottom: 32 },
+  
+  optionsContainer: { width: '100%' },
+  
+  optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.border,
     padding: 20,
+    borderWidth: 2,
+    borderColor: colors.border,
     borderRadius: globalStyles.cardRadius,
     marginBottom: 16,
+    backgroundColor: colors.white,
   },
-  optionSelected: {
+  optionCardSelected: {
     borderColor: colors.primary,
     backgroundColor: '#fffde7',
   },
+  
   radioCircle: {
     width: 24,
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
     borderColor: colors.border,
+    marginRight: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
   },
-  radioSelected: {
+  radioCircleSelected: {
     borderColor: colors.primary,
   },
-  radioInner: {
+  radioDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
     backgroundColor: colors.primary,
   },
-  optionText: { fontSize: 16, color: colors.black, flex: 1 },
   
-  footer: { padding: 20, paddingBottom: 40, borderTopWidth: 1, borderTopColor: colors.border },
+  optionText: { fontSize: 16, color: colors.black, flex: 1 },
+  optionTextSelected: { fontWeight: 'bold' },
+  
+  footer: { padding: 20, paddingBottom: 40 },
   nextButton: {
     backgroundColor: colors.primary,
     padding: 18,
@@ -150,7 +168,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   nextButtonDisabled: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.lightGray,
   },
   nextButtonText: { fontSize: 18, fontWeight: 'bold', color: colors.black }
 });

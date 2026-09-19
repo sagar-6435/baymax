@@ -5,9 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeDashboard from '../pages/main/HomeDashboard';
 import NotificationsScreen from '../pages/main/NotificationsScreen';
 import GlobalSearchScreen from '../pages/main/GlobalSearchScreen';
-
-// Health
 import AiHealthAssistant from '../pages/health/AiHealthAssistant';
+import ChatHistory from '../pages/health/ChatHistory';
 import AiResponseHealthAssessment from '../pages/health/AiResponseHealthAssessment';
 import HealthFollowUpConversation from '../pages/health/HealthFollowUpConversation';
 import HealthConversationHistory from '../pages/health/HealthConversationHistory';
@@ -95,6 +94,8 @@ export const HomeStack = () => (
     <Stack.Screen name="BreathingExercise" component={BreathingExercise} />
     <Stack.Screen name="RelaxationExercise" component={RelaxationExercise} />
     <Stack.Screen name="ActivitySummary" component={ActivitySummary} />
+    <Stack.Screen name="AiHealthAssistant" component={AiHealthAssistant} />
+    <Stack.Screen name="ChatHistory" component={ChatHistory} />
     <Stack.Screen name="WellnessRecommendations" component={WellnessRecommendations} />
     <Stack.Screen name="WellnessHistory" component={WellnessHistory} />
   </Stack.Navigator>
@@ -103,6 +104,7 @@ export const HomeStack = () => (
 export const HealthStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="AiHealthAssistant" component={AiHealthAssistant} />
+    <Stack.Screen name="ChatHistory" component={ChatHistory} />
     <Stack.Screen name="AiResponseHealthAssessment" component={AiResponseHealthAssessment} />
     <Stack.Screen name="HealthFollowUpConversation" component={HealthFollowUpConversation} />
     <Stack.Screen name="HealthConversationHistory" component={HealthConversationHistory} />

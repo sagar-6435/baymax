@@ -3,9 +3,12 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
+import { getLessonByTitle } from '../../data/learningData';
 
 const Quiz = ({ navigation, route }) => {
   const title = route?.params?.title || "Health Quiz";
+  const lesson = getLessonByTitle(title);
+  const numQuestions = lesson?.quiz?.length || 3;
 
   return (
     <View style={styles.container}>
@@ -17,12 +20,12 @@ const Quiz = ({ navigation, route }) => {
         </View>
         
         <Text style={styles.title}>Ready for a quick check?</Text>
-        <Text style={styles.subtitle}>Test your knowledge on "{title}". There are 3 questions to complete this lesson.</Text>
+        <Text style={styles.subtitle}>Test your knowledge on "{title}". There are {numQuestions} questions to complete this lesson.</Text>
 
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
             <Ionicons name="help-circle-outline" size={24} color={colors.primary} />
-            <Text style={styles.statText}>3 Questions</Text>
+            <Text style={styles.statText}>{numQuestions} Questions</Text>
           </View>
           <View style={styles.statBox}>
             <Ionicons name="time-outline" size={24} color={colors.primary} />
@@ -34,7 +37,7 @@ const Quiz = ({ navigation, route }) => {
       <View style={styles.footer}>
         <TouchableOpacity 
           style={styles.startButton} 
-          onPress={() => navigation.navigate('QuizQuestion', { title, questionIndex: 0 })}
+          onPress={() => navigation.navigate('QuizQuestion', { title, questionIndex: 0, userAnswers: [] })}
         >
           <Text style={styles.startButtonText}>Let's Go!</Text>
         </TouchableOpacity>

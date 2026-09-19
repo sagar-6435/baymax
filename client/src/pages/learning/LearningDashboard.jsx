@@ -2,8 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { colors, globalStyles } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../context/AuthContext';
 
 const LearningDashboard = ({ navigation }) => {
+  const { user } = useAuth();
+  
+  // Extract user chronic conditions, if any
+  const conditions = user?.health?.chronicConditions || [];
   return (
     <ScrollView style={styles.container}>
       <TouchableOpacity 
@@ -28,6 +33,27 @@ const LearningDashboard = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       
+      {/* Personalized Condition Modules */}
+      {conditions.map((condition, index) => (
+        <TouchableOpacity 
+          key={`cond-${index}`}
+          style={[styles.moduleCard, { borderColor: colors.primary, backgroundColor: '#FFF9E6' }]}
+          onPress={() => navigation.navigate('DiseaseModule', { condition })}
+        >
+          <View style={[styles.moduleIconContainer, { backgroundColor: colors.white }]}>
+            <Text style={styles.moduleIcon}>💊</Text>
+          </View>
+          <View style={styles.moduleInfo}>
+            <Text style={styles.moduleTitle}>Living with {condition}</Text>
+            <Text style={styles.moduleSub}>Personalized module for you</Text>
+            <View style={styles.smallProgressBar}>
+              <View style={[styles.smallProgressFill, {width: '0%'}]}></View>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.darkGray} />
+        </TouchableOpacity>
+      ))}
+
       <TouchableOpacity 
         style={styles.moduleCard}
         onPress={() => navigation.navigate('AnatomyModule')}

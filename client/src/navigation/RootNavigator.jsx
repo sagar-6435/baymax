@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import OnboardingStack from './OnboardingStack';
 import MainTabNavigator from './MainTabNavigator';
+import HealthOnboardingStack from './HealthOnboardingStack';
 import { useAuth } from '../context/AuthContext';
 
 // Modals
@@ -14,14 +15,18 @@ import ExportOptions from '../pages/reports/ExportOptions';
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
-  const { isOnboardingCompleted } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+
+  const isHealthOnboardingComplete = user?.onboarding?.completed || user?.onboarding?.skipped;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {/* Main Flow Group */}
       <Stack.Group>
-        {!isOnboardingCompleted ? (
+        {!isAuthenticated ? (
           <Stack.Screen name="Onboarding" component={OnboardingStack} />
+        ) : !isHealthOnboardingComplete ? (
+          <Stack.Screen name="HealthOnboarding" component={HealthOnboardingStack} />
         ) : (
           <Stack.Screen name="MainApp" component={MainTabNavigator} />
         )}

@@ -3,9 +3,22 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
+import { getLessonByTitle } from '../../data/learningData';
 
 const LessonDetails = ({ navigation, route }) => {
   const lessonTitle = route?.params?.title || "Lesson Overview";
+  const lesson = getLessonByTitle(lessonTitle);
+
+  if (!lesson) {
+    return (
+      <View style={styles.container}>
+        <AppHeader showBack={true} onBack={() => navigation.goBack()} />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>Lesson not found.</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -14,13 +27,13 @@ const LessonDetails = ({ navigation, route }) => {
       <ScrollView style={styles.content}>
         
         <View style={styles.heroCard}>
-          <Text style={styles.heroEmoji}>📘</Text>
-          <Text style={styles.heroTitle}>{lessonTitle}</Text>
+          <Text style={styles.heroEmoji}>{lesson.icon}</Text>
+          <Text style={styles.heroTitle}>{lesson.title}</Text>
           
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Ionicons name="time-outline" size={16} color={colors.darkGray} />
-              <Text style={styles.statText}>15 mins</Text>
+              <Text style={styles.statText}>{lesson.time}</Text>
             </View>
             <View style={styles.statItem}>
               <Ionicons name="flame-outline" size={16} color={colors.darkGray} />
@@ -35,24 +48,17 @@ const LessonDetails = ({ navigation, route }) => {
 
         <Text style={styles.sectionTitle}>ABOUT THIS LESSON</Text>
         <Text style={styles.descriptionText}>
-          In this lesson, you will learn the foundational concepts required to master the topic. 
-          We'll cover the basics, common misconceptions, and practical applications that you can use in your daily life.
+          {lesson.description}
         </Text>
 
         <Text style={styles.sectionTitle}>WHAT YOU'LL LEARN</Text>
         
-        <View style={styles.objectiveRow}>
-          <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
-          <Text style={styles.objectiveText}>Understand the core principles and functions.</Text>
-        </View>
-        <View style={styles.objectiveRow}>
-          <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
-          <Text style={styles.objectiveText}>Identify key components and their interactions.</Text>
-        </View>
-        <View style={styles.objectiveRow}>
-          <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
-          <Text style={styles.objectiveText}>Apply this knowledge in practical scenarios.</Text>
-        </View>
+        {lesson.objectives.map((obj, index) => (
+          <View key={index} style={styles.objectiveRow}>
+            <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+            <Text style={styles.objectiveText}>{obj}</Text>
+          </View>
+        ))}
 
         <View style={{ height: 100 }} />
       </ScrollView>

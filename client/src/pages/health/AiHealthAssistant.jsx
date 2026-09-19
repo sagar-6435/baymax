@@ -1,35 +1,89 @@
 import AppHeader from '../../components/AppHeader';
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Animated, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 import { generateLlmResponseStream } from '../../services/llmService';
+import { useAuth } from '../../context/AuthContext';
+import { userService } from '../../services/userService';
+
+const TypingIndicator = () => {
+  const dot1 = useRef(new Animated.Value(0)).current;
+  const dot2 = useRef(new Animated.Value(0)).current;
+  const dot3 = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animate = (dot, delay) => {
+      Animated.sequence([
+        Animated.delay(delay),
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(dot, { toValue: -6, duration: 300, useNativeDriver: true }),
+            Animated.timing(dot, { toValue: 0, duration: 300, useNativeDriver: true }),
+            Animated.delay(400)
+          ])
+        )
+      ]).start();
+    };
+
+    animate(dot1, 0);
+    animate(dot2, 150);
+    animate(dot3, 300);
+  }, []);
+
+  return (
+    <View style={styles.typingIndicatorContainer}>
+      <Animated.View style={[styles.dot, { transform: [{ translateY: dot1 }] }]} />
+      <Animated.View style={[styles.dot, { transform: [{ translateY: dot2 }] }]} />
+      <Animated.View style={[styles.dot, { transform: [{ translateY: dot3 }] }]} />
+    </View>
+  );
+};
 
 const AiHealthAssistant = ({ route, navigation }) => {
-  const [messages, setMessages] = useState([
-    { id: '1', role: 'bot', text: 'Hello! I am Baymax, your personal healthcare companion. How can I assist you today?' }
-  ]);
+  const { user, updateUser } = useAuth();
+  
+  // Load initial messages from user's history if available
+  const initialMessages = user?.aiChatHistory?.length > 0 
+    ? user.aiChatHistory 
+    : [{ id: '1', role: 'bot', text: 'Hello! I am Baymax, your personal healthcare companion. How can I assist you today?' }];
+
+  const [messages, setMessages] = useState(initialMessages);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const scrollViewRef = useRef();
 
   useEffect(() => {
     if (route.params?.voiceText) {
       setInputText(route.params.voiceText);
-      // Clear the param so it doesn't stay there forever
       navigation.setParams({ voiceText: undefined });
     }
   }, [route.params?.voiceText]);
 
+  const chronicConditions = user?.health?.chronicConditions || [];
+  
+  const dynamicPrompts = chronicConditions.map(c => `Tips for managing ${c}`);
+  
   const suggestions = [
+    ...dynamicPrompts,
     "I have a headache",
     "What should I do for a burn?",
     "How can I sleep better?",
     "Healthy diet tips"
   ];
 
+  const saveChatHistory = async (newHistory) => {
+    try {
+      const updatedUser = await userService.updateProfile({ aiChatHistory: newHistory });
+      updateUser(updatedUser);
+    } catch (error) {
+      console.error("Failed to save chat history:", error);
+    }
+  };
+
   const handleSend = async (textOverride = null) => {
-    if (isLoading) return; // Prevent double submission
+    if (isLoading) return;
     
     const actualOverride = typeof textOverride === 'string' ? textOverride : null;
     const userMsg = actualOverride || inputText.trim();
@@ -37,34 +91,50 @@ const AiHealthAssistant = ({ route, navigation }) => {
 
     setInputText('');
     
-    // Add user message
-    const newMessages = [...messages, { id: Date.now().toString(), role: 'user', text: userMsg }];
+    const newMessages = [...messages, { id: Date.now().toString(), role: 'user', text: userMsg, timestamp: new Date().toISOString() }];
     setMessages(newMessages);
     
-    // Immediately add an empty bot message that we will stream into
+    // Save user message immediately
+    saveChatHistory(newMessages);
+    
     const botMsgId = (Date.now() + 1).toString();
-    setMessages((prev) => [...prev, { id: botMsgId, role: 'bot', text: '' }]);
+    setMessages((prev) => [...prev, { id: botMsgId, role: 'bot', text: '', timestamp: new Date().toISOString() }]);
     setIsLoading(true);
 
-    // System prompt tailored for Baymax Health Assistant
     const systemPrompt = "You are Baymax, a personal healthcare companion. You are polite, medically informed (but always advise consulting a real doctor for serious issues), and highly empathetic. Keep responses concise and structured.";
     
-    // Create a context window from previous messages (simple string concatenation for the prompt)
     const contextPrompt = newMessages.map(m => `${m.role === 'user' ? 'Patient' : 'Baymax'}: ${m.text}`).join('\n') + '\nBaymax:';
 
+    let finalBotText = "";
     try {
       await generateLlmResponseStream(contextPrompt, systemPrompt, (partialText) => {
-        setIsLoading(false); // Hide the generic loading spinner once text starts arriving
+        setIsLoading(false); 
+        finalBotText = partialText;
         setMessages((prev) => 
           prev.map(m => m.id === botMsgId ? { ...m, text: partialText } : m)
         );
       });
+      
+      // Save final bot message
+      const finalMessages = [...newMessages, { id: botMsgId, role: 'bot', text: finalBotText, timestamp: new Date().toISOString() }];
+      saveChatHistory(finalMessages);
+
     } catch (error) {
       setIsLoading(false);
+      finalBotText = "I'm having trouble connecting to my local AI brain right now.";
       setMessages((prev) => 
-        prev.map(m => m.id === botMsgId ? { ...m, text: "I'm having trouble connecting to my local AI brain right now." } : m)
+        prev.map(m => m.id === botMsgId ? { ...m, text: finalBotText } : m)
       );
+      
+      const finalMessages = [...newMessages, { id: botMsgId, role: 'bot', text: finalBotText, timestamp: new Date().toISOString() }];
+      saveChatHistory(finalMessages);
     }
+  };
+
+  const clearChat = () => {
+    const defaultMsg = [{ id: '1', role: 'bot', text: 'Hello! I am Baymax, your personal healthcare companion. How can I assist you today?' }];
+    setMessages(defaultMsg);
+    saveChatHistory([]);
   };
 
   return (
@@ -73,13 +143,61 @@ const AiHealthAssistant = ({ route, navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
+      <AppHeader 
+        showBack={true} 
+        onBack={() => navigation.goBack()} 
+        rightComponent={
+          <TouchableOpacity style={{ padding: 4 }} onPress={() => setShowMenu(true)}>
+            <Ionicons name="ellipsis-vertical" size={24} color={colors.black} />
+          </TouchableOpacity>
+        }
+      />
+      
+      {/* Dropdown Menu Modal */}
+      <Modal visible={showMenu} transparent={true} animationType="fade" onRequestClose={() => setShowMenu(false)}>
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowMenu(false)}>
+          <View style={styles.menuContainer}>
+            <TouchableOpacity 
+              style={styles.menuItem} 
+              onPress={() => {
+                setShowMenu(false);
+                navigation.navigate('ChatHistory');
+              }}
+            >
+              <Ionicons name="time-outline" size={20} color={colors.black} style={styles.menuIcon} />
+              <Text style={styles.menuText}>See History</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.menuItem} 
+              onPress={() => {
+                setShowMenu(false);
+                clearChat();
+              }}
+            >
+              <Ionicons name="trash-outline" size={20} color={colors.black} style={styles.menuIcon} />
+              <Text style={styles.menuText}>Clear Chat</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.menuItem, { borderBottomWidth: 0 }]} 
+              onPress={() => {
+                setShowMenu(false);
+                Alert.alert("About AI Health", "Baymax AI is your personal healthcare companion. It uses advanced language models to provide general health advice. Always consult a real doctor for serious conditions.");
+              }}
+            >
+              <Ionicons name="information-circle-outline" size={20} color={colors.black} style={styles.menuIcon} />
+              <Text style={styles.menuText}>About</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
       
       <ScrollView 
         style={styles.chatArea}
         ref={scrollViewRef}
         onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
-        contentContainerStyle={{ paddingBottom: 60 }} // Extra padding for the floating suggestions
+        contentContainerStyle={{ paddingBottom: 60 }} 
       >
         {messages.map((msg) => (
           <View key={msg.id} style={msg.role === 'bot' ? styles.botMessageWrapper : styles.userMessageWrapper}>
@@ -90,9 +208,7 @@ const AiHealthAssistant = ({ route, navigation }) => {
             )}
             <View style={msg.role === 'bot' ? styles.botMessageCard : styles.userMessage}>
               {msg.role === 'bot' && msg.text === '' ? (
-                <View style={styles.typingIndicatorContainer}>
-                  <Text style={styles.typingIndicator}>● ● ●</Text>
-                </View>
+                <TypingIndicator />
               ) : (
                 <Text style={styles.messageText}>{msg.text}</Text>
               )}
@@ -126,10 +242,10 @@ const AiHealthAssistant = ({ route, navigation }) => {
               onChangeText={setInputText}
               onSubmitEditing={() => handleSend()}
             />
-            <TouchableOpacity style={styles.sendButton} onPress={() => handleSend()}>
-              <Ionicons name="send" size={20} color={colors.black} />
-            </TouchableOpacity>
           </View>
+          <TouchableOpacity style={styles.sendButton} onPress={() => handleSend()}>
+            <Ionicons name="send" size={20} color={colors.black} />
+          </TouchableOpacity>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -180,8 +296,8 @@ const styles = StyleSheet.create({
   },
   messageText: { fontSize: 16, color: colors.black, lineHeight: 24 },
   
-  typingIndicatorContainer: { paddingVertical: 4, paddingHorizontal: 8 },
-  typingIndicator: { fontSize: 18, color: colors.darkGray, letterSpacing: 2 },
+  typingIndicatorContainer: { flexDirection: 'row', paddingVertical: 8, paddingHorizontal: 12, alignItems: 'center' },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.darkGray, marginHorizontal: 3 },
   
   bottomAreaContainer: {
     backgroundColor: colors.white,
@@ -190,7 +306,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     paddingVertical: 10,
     position: 'absolute',
-    top: -50,
+    top: -65,
     left: 0,
     right: 0,
     zIndex: 5,
@@ -227,18 +343,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: Platform.OS === 'ios' ? 30 : 16
   },
-  micButton: { marginRight: 12, backgroundColor: colors.white, padding: 12, borderRadius: 24 },
+  micButton: { marginRight: 12, backgroundColor: '#f3f4f6', padding: 12, borderRadius: 24 },
   textInputContainer: { 
     flex: 1, 
     flexDirection: 'row',
     alignItems: 'center',
     height: 50, 
-    backgroundColor: colors.white, 
+    backgroundColor: '#f3f4f6', 
     borderRadius: 25, 
     paddingHorizontal: 20 
   },
   textInput: { flex: 1, fontSize: 16, color: colors.black },
-  sendButton: { marginLeft: 10, padding: 4 }
+  sendButton: { marginLeft: 10, padding: 8, backgroundColor: colors.primary, borderRadius: 20 },
+  
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.2)' },
+  menuContainer: { 
+    position: 'absolute', 
+    top: 60, 
+    right: 20, 
+    backgroundColor: colors.white, 
+    borderRadius: 12, 
+    width: 200,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  menuItem: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    padding: 16, 
+    borderBottomWidth: 1, 
+    borderBottomColor: colors.border 
+  },
+  menuIcon: { marginRight: 12 },
+  menuText: { fontSize: 16, color: colors.black }
 });
 
 export default AiHealthAssistant;

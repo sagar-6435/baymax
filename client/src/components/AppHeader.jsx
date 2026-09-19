@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { colors } from '../theme';
 
-const AppHeader = ({ notificationCount = 3, showNotifications = true, showBack = false, onBack }) => {
+const AppHeader = ({ notificationCount = 3, showNotifications = true, showBack = false, onBack, rightComponent }) => {
   return (
     <View style={styles.headerRow}>
       <View style={styles.logoContainer}>
@@ -20,7 +20,9 @@ const AppHeader = ({ notificationCount = 3, showNotifications = true, showBack =
         </View>
       </View>
       
-      {showNotifications && (
+      {rightComponent ? (
+        rightComponent
+      ) : showNotifications ? (
         <TouchableOpacity style={styles.notificationBtn}>
           <Ionicons name="notifications-outline" size={28} color={colors.black} />
           {notificationCount > 0 && (
@@ -29,7 +31,7 @@ const AppHeader = ({ notificationCount = 3, showNotifications = true, showBack =
             </View>
           )}
         </TouchableOpacity>
-      )}
+      ) : null}
     </View>
   );
 };

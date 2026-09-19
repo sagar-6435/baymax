@@ -1,7 +1,7 @@
 // Configure your local Ollama URL here. 
 // If running on a physical device over WiFi, use your computer's local IP
 // If using ngrok, use your ngrok URL.
-export const OLLAMA_API_URL = 'http://192.168.0.185:11434/api/generate';
+export const OLLAMA_API_URL = 'http://192.168.1.4:11434/api/generate';
 
 // Set your preferred local model here
 export const OLLAMA_MODEL = 'qwen2.5:3b'; 
