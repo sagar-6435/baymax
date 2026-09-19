@@ -143,7 +143,7 @@ const HomeDashboard = ({ navigation }) => {
             <Text style={styles.speechBubbleText}>Hi! 👋</Text>
           </Animated.View>
           <Animated.Image 
-            source={require('../../../assets/baymax_robot.jpg')} 
+            source={require('../../../assets/baymax_robot.png')} 
             style={[styles.baymaxImage, { transform: [{ translateY }, { scale }] }]}
           />
         </View>

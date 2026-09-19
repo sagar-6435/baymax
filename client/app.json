@@ -12,7 +12,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/baymax_robot.jpg"
+        "foregroundImage": "./assets/baymax_robot.png"
       },
       "permissions": [
         "android.permission.RECORD_AUDIO"
@@ -39,7 +39,8 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "@react-native-community/datetimepicker"
     ],
     "extra": {
       "eas": {
