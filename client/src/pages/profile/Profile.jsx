@@ -56,6 +56,12 @@ const Profile = ({ navigation }) => {
             <Text style={styles.listText}>Emergency Contacts</Text>
             <Ionicons name="chevron-forward" size={20} color={colors.border} />
           </TouchableOpacity>
+          <View style={styles.divider} />
+          <TouchableOpacity style={styles.listItem} onPress={() => navigation.navigate('EmergencyCardEditor')}>
+            <Ionicons name="card-outline" size={20} color={colors.darkGray} style={styles.listIcon} />
+            <Text style={styles.listText}>Emergency Card</Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.border} />
+          </TouchableOpacity>
         </View>
       </View>
 

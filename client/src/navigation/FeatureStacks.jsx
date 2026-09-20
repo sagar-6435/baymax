@@ -11,6 +11,7 @@ import DetailedChatHistory from '../pages/health/DetailedChatHistory';
 import AiResponseHealthAssessment from '../pages/health/AiResponseHealthAssessment';
 import HealthFollowUpConversation from '../pages/health/HealthFollowUpConversation';
 import HealthConversationHistory from '../pages/health/HealthConversationHistory';
+import SymptomExplorationMode from '../pages/health/SymptomExplorationMode';
 
 // First Aid
 import FirstAidHome from '../pages/firstaid/FirstAidHome';
@@ -20,6 +21,7 @@ import BleedingTutorial from '../pages/firstaid/BleedingTutorial';
 import BurnsTutorial from '../pages/firstaid/BurnsTutorial';
 import FractureInjuryTutorial from '../pages/firstaid/FractureInjuryTutorial';
 import FirstAidCompletionSummary from '../pages/firstaid/FirstAidCompletionSummary';
+import ScenarioPlayer from '../pages/firstaid/ScenarioPlayer';
 
 // Learning
 import LearningDashboard from '../pages/learning/LearningDashboard';
@@ -37,6 +39,8 @@ import QuizResult from '../pages/learning/QuizResult';
 import ReviewAnswers from '../pages/learning/ReviewAnswers';
 import LearningProgress from '../pages/learning/LearningProgress';
 import AchievementsBadges from '../pages/learning/AchievementsBadges';
+import ExplainMedicalText from '../pages/health/ExplainMedicalText';
+import OfflineLibraryReader from '../pages/learning/OfflineLibraryReader';
 
 // Medicine
 import MedicineHome from '../pages/medicine/MedicineHome';
@@ -58,6 +62,7 @@ import PrivacyCenter from '../pages/privacy/PrivacyCenter';
 import PersonalInformation from '../pages/profile/PersonalInformation';
 import HealthPreferences from '../pages/profile/HealthPreferences';
 import EmergencyInformation from '../pages/profile/EmergencyInformation';
+import EmergencyCardEditor from '../pages/profile/EmergencyCardEditor';
 
 // Wellness
 import WellnessDashboard from '../pages/wellness/WellnessDashboard';
@@ -111,6 +116,7 @@ export const HealthStack = () => (
     <Stack.Screen name="AiResponseHealthAssessment" component={AiResponseHealthAssessment} />
     <Stack.Screen name="HealthFollowUpConversation" component={HealthFollowUpConversation} />
     <Stack.Screen name="HealthConversationHistory" component={HealthConversationHistory} />
+    <Stack.Screen name="SymptomExplorationMode" component={SymptomExplorationMode} />
   </Stack.Navigator>
 );
 
@@ -123,6 +129,7 @@ export const FirstAidStack = () => (
     <Stack.Screen name="BurnsTutorial" component={BurnsTutorial} />
     <Stack.Screen name="FractureInjuryTutorial" component={FractureInjuryTutorial} />
     <Stack.Screen name="FirstAidCompletionSummary" component={FirstAidCompletionSummary} />
+    <Stack.Screen name="ScenarioPlayer" component={ScenarioPlayer} />
   </Stack.Navigator>
 );
 
@@ -143,6 +150,8 @@ export const LearningStack = () => (
     <Stack.Screen name="ReviewAnswers" component={ReviewAnswers} />
     <Stack.Screen name="LearningProgress" component={LearningProgress} />
     <Stack.Screen name="AchievementsBadges" component={AchievementsBadges} />
+    <Stack.Screen name="ExplainMedicalText" component={ExplainMedicalText} />
+    <Stack.Screen name="OfflineLibraryReader" component={OfflineLibraryReader} />
   </Stack.Navigator>
 );
 
@@ -152,6 +161,7 @@ export const ProfileStack = () => (
     <Stack.Screen name="PersonalInformation" component={PersonalInformation} />
     <Stack.Screen name="HealthPreferences" component={HealthPreferences} />
     <Stack.Screen name="EmergencyInformation" component={EmergencyInformation} />
+    <Stack.Screen name="EmergencyCardEditor" component={EmergencyCardEditor} />
     <Stack.Screen name="Settings" component={Settings} />
     <Stack.Screen name="PrivacyCenter" component={PrivacyCenter} />
   </Stack.Navigator>

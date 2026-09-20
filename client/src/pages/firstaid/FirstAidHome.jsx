@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { colors, globalStyles } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
+import { scenarios } from '../../data/scenarioData';
 
 const FirstAidHome = ({ navigation }) => {
   return (
@@ -43,6 +44,27 @@ const FirstAidHome = ({ navigation }) => {
           <Text style={styles.gridText}>Fracture</Text>
         </TouchableOpacity>
       </View>
+
+      <Text style={[styles.sectionTitle, { marginTop: 10 }]}>PRACTICE SCENARIOS</Text>
+      
+      {scenarios.map((scenario) => (
+        <TouchableOpacity 
+          key={scenario.id} 
+          style={styles.scenarioCard}
+          onPress={() => navigation.navigate('ScenarioPlayer', { scenario })}
+        >
+          <View style={styles.scenarioIconContainer}>
+            <Text style={styles.scenarioIcon}>{scenario.icon}</Text>
+          </View>
+          <View style={styles.scenarioContent}>
+            <Text style={styles.scenarioTitle}>{scenario.title}</Text>
+            <Text style={styles.scenarioDesc} numberOfLines={2}>{scenario.description}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color={colors.darkGray} />
+        </TouchableOpacity>
+      ))}
+      
+      <View style={{ height: 40 }} />
     </ScrollView>
   );
 };
@@ -84,7 +106,31 @@ const styles = StyleSheet.create({
     marginBottom: 12 
   },
   gridIcon: { fontSize: 28 },
-  gridText: { fontSize: 16, fontWeight: 'bold', color: colors.black }
+  gridText: { fontSize: 16, fontWeight: 'bold', color: colors.black },
+  
+  scenarioCard: {
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: globalStyles.cardRadius,
+    padding: 16,
+    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  scenarioIconContainer: {
+    width: 50,
+    height: 50,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16
+  },
+  scenarioIcon: { fontSize: 24 },
+  scenarioContent: { flex: 1, paddingRight: 10 },
+  scenarioTitle: { fontSize: 16, fontWeight: 'bold', color: colors.black, marginBottom: 4 },
+  scenarioDesc: { fontSize: 13, color: colors.darkGray, lineHeight: 18 }
 });
 
 export default FirstAidHome;

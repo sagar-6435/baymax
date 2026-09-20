@@ -1,6 +1,7 @@
 import AppHeader from '../../components/AppHeader';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import * as Contacts from 'expo-contacts/legacy';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 import PrimaryButton from '../../components/PrimaryButton';
@@ -15,6 +16,37 @@ const EmergencyInformation = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const contacts = user?.emergencyContacts || [];
+
+  const handlePickContact = async () => {
+    try {
+      const { status } = await Contacts.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'We need access to your contacts to pick an emergency contact.');
+        return;
+      }
+      
+      const { data } = await Contacts.getContactsAsync({
+        fields: [Contacts.Fields.PhoneNumbers],
+      });
+      
+      if (data.length > 0) {
+         Alert.alert(
+            'Contacts Loaded', 
+            `Found ${data.length} contacts. Note: A custom picker is usually required here, but we will auto-fill with the first one for demonstration.`
+         );
+         const contact = data[0];
+         setNewContact(prev => ({
+           ...prev,
+           name: contact.name || '',
+           phone: (contact.phoneNumbers && contact.phoneNumbers.length > 0) ? contact.phoneNumbers[0].number || '' : ''
+         }));
+      } else {
+         Alert.alert('No Contacts', 'No contacts found on this device.');
+      }
+    } catch (err) {
+      console.log('Error picking contact', err);
+    }
+  };
 
   const handleAddContact = async () => {
     if (!newContact.name || !newContact.phone) {
@@ -135,6 +167,11 @@ const EmergencyInformation = ({ navigation }) => {
                 <Ionicons name="close" size={24} color={colors.black} />
               </TouchableOpacity>
             </View>
+
+            <TouchableOpacity style={styles.pickContactBtn} onPress={handlePickContact}>
+              <Ionicons name="people-circle-outline" size={24} color={colors.primary} />
+              <Text style={styles.pickContactText}>Choose from Contacts</Text>
+            </TouchableOpacity>
             
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Name</Text>
@@ -227,6 +264,25 @@ const styles = StyleSheet.create({
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   modalTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black },
   
+  pickContactBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0F7FF',
+    padding: 12,
+    borderRadius: globalStyles.cardRadius,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+  },
+  pickContactText: {
+    marginLeft: 8,
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
   inputGroup: { marginBottom: 16 },
   inputLabel: { fontSize: 14, color: colors.darkGray, marginBottom: 8 },
   textInput: {

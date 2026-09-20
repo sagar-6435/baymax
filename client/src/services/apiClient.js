@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
-const API_BASE_URL = 'https://baymax-z27h.onrender.com/api';
+const API_BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/api' : 'http://localhost:5000/api';
 
 export const apiClient = async (endpoint, options = {}) => {
   const token = await AsyncStorage.getItem('userToken');

@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, globalStyles } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 
 const LearningDashboard = ({ navigation }) => {
   const { user } = useAuth();
+  const [struggledTopics, setStruggledTopics] = useState([]);
   
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('struggledTopics');
+        if (stored) {
+          setStruggledTopics(JSON.parse(stored));
+        }
+      } catch (e) {
+        console.error('Failed to load struggled topics', e);
+      }
+    };
+    // Need to refetch when screen comes into focus
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchTopics();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   // Extract user chronic conditions, if any
   const conditions = user?.health?.chronicConditions || [];
   return (
@@ -27,12 +47,58 @@ const LearningDashboard = ({ navigation }) => {
       </TouchableOpacity>
 
       <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>LEARNING TOOLS</Text>
+      </View>
+
+      <View style={styles.toolsRow}>
+        <TouchableOpacity 
+          style={styles.toolButton}
+          onPress={() => navigation.navigate('ExplainMedicalText')}
+        >
+          <Ionicons name="chatbubbles" size={24} color={colors.primary} />
+          <Text style={styles.toolButtonText}>Explain Simply</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.toolButton}
+          onPress={() => navigation.navigate('OfflineLibraryReader')}
+        >
+          <Ionicons name="cloud-offline" size={24} color={colors.primary} />
+          <Text style={styles.toolButtonText}>Offline Library</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>CATEGORIES</Text>
         <TouchableOpacity onPress={() => navigation.navigate('LearningCategories')}>
           <Text style={styles.seeAllText}>See All</Text>
         </TouchableOpacity>
       </View>
       
+      {/* Recommended for Review */}
+      {struggledTopics.length > 0 && (
+        <View style={{marginBottom: 10}}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: '#E65100' }]}>RECOMMENDED FOR REVIEW</Text>
+          </View>
+          {struggledTopics.map((topic, index) => (
+            <TouchableOpacity 
+              key={`review-${index}`}
+              style={[styles.moduleCard, { borderColor: '#E65100', backgroundColor: '#FFF3E0' }]}
+              onPress={() => navigation.navigate('LessonDetails', { title: topic })}
+            >
+              <View style={[styles.moduleIconContainer, { backgroundColor: colors.white }]}>
+                <Text style={styles.moduleIcon}>🔄</Text>
+              </View>
+              <View style={styles.moduleInfo}>
+                <Text style={styles.moduleTitle}>{topic}</Text>
+                <Text style={styles.moduleSub}>Let's practice this again</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={colors.darkGray} />
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
       {/* Personalized Condition Modules */}
       {conditions.map((condition, index) => (
         <TouchableOpacity 
@@ -120,6 +186,18 @@ const styles = StyleSheet.create({
   progressBarContainer: { height: 8, backgroundColor: colors.black + '20', borderRadius: 4, marginBottom: 8 },
   progressBarFill: { width: '75%', height: '100%', backgroundColor: colors.black, borderRadius: 4 },
   progressText: { color: colors.darkGray, fontSize: 14, fontWeight: 'bold' },
+  
+  toolsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24 },
+  toolButton: { 
+    flex: 1, 
+    backgroundColor: '#F3F4F6', 
+    padding: 16, 
+    borderRadius: 12, 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  toolButtonText: { fontSize: 14, fontWeight: 'bold', color: colors.black, marginTop: 8 },
   
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1 },

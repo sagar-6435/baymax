@@ -149,6 +149,18 @@ const HomeDashboard = ({ navigation }) => {
         </View>
       </View>
 
+      {/* Emergency Mode Entry */}
+      <TouchableOpacity 
+        style={styles.emergencyButton} 
+        onPress={() => navigation.navigate('OfflineEmergencyMode')}
+      >
+        <Ionicons name="warning" size={28} color={colors.white} style={{ marginRight: 10 }} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.emergencyTitle}>EMERGENCY / SOS</Text>
+          <Text style={styles.emergencySub}>Tap for offline first-aid guidance</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color={colors.white} />
+      </TouchableOpacity>
 
 
       {/* Quick Actions Header */}
@@ -275,7 +287,32 @@ const styles = StyleSheet.create({
   iconWrapper: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
   gridText: { fontSize: 18, fontWeight: '900', color: colors.black, marginBottom: 8 },
   gridSubText: { fontSize: 14, color: '#555', lineHeight: 20 },
-  arrowButton: { backgroundColor: colors.primary, width: 30, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center', position: 'absolute', bottom: 15, right: 15 }
+  arrowButton: { backgroundColor: colors.primary, width: 30, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center', position: 'absolute', bottom: 15, right: 15 },
+  
+  emergencyButton: {
+    backgroundColor: '#FF3B30',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 30,
+    shadowColor: '#FF3B30',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  emergencyTitle: {
+    color: colors.white,
+    fontSize: 20,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  emergencySub: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 14,
+    fontWeight: '600',
+  }
 });
 
 export default HomeDashboard;

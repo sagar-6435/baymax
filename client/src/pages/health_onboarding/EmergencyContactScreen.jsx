@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import * as Contacts from 'expo-contacts';
+import * as Contacts from 'expo-contacts/legacy';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 import PrimaryButton from '../../components/PrimaryButton';

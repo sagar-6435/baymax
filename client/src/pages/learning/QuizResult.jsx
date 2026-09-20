@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, globalStyles } from '../../theme';
 import { getLessonByTitle } from '../../data/learningData';
 
@@ -12,12 +13,29 @@ const QuizResult = ({ navigation, route }) => {
   const questions = lessonData?.quiz || [];
   const total = questions.length;
   
-  // Evaluate score using answerIndex
   const score = userAnswers.reduce((acc, ans, index) => {
-    return acc + (ans === questions[index].answerIndex ? 1 : 0);
+    return acc + (ans === questions[index].correct ? 1 : 0);
   }, 0);
 
   const isPerfect = score === total && total > 0;
+
+  useEffect(() => {
+    const saveStruggledTopic = async () => {
+      if (!isPerfect && title) {
+        try {
+          const stored = await AsyncStorage.getItem('struggledTopics');
+          let topics = stored ? JSON.parse(stored) : [];
+          if (!topics.includes(title)) {
+            topics.push(title);
+            await AsyncStorage.setItem('struggledTopics', JSON.stringify(topics));
+          }
+        } catch (e) {
+          console.error('Failed to save struggled topic', e);
+        }
+      }
+    };
+    saveStruggledTopic();
+  }, [isPerfect, title]);
 
   return (
     <View style={styles.container}>

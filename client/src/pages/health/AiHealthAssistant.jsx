@@ -218,6 +218,17 @@ const AiHealthAssistant = ({ route, navigation }) => {
       </ScrollView>
 
       <View style={styles.bottomAreaContainer}>
+        {/* Special Modes */}
+        <View style={styles.specialModesContainer}>
+          <TouchableOpacity 
+            style={styles.symptomModeButton} 
+            onPress={() => navigation.navigate('SymptomExplorationMode')}
+          >
+            <Ionicons name="medical" size={16} color={colors.white} style={{marginRight: 6}} />
+            <Text style={styles.symptomModeText}>I Don't Know What's Wrong</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Floating Suggestions Area */}
         <View style={styles.suggestionsContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScroll}>
@@ -301,6 +312,32 @@ const styles = StyleSheet.create({
   
   bottomAreaContainer: {
     backgroundColor: colors.white,
+  },
+  specialModesContainer: {
+    position: 'absolute',
+    top: -110,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 5,
+  },
+  symptomModeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E65100', // Distinct alert color
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  symptomModeText: {
+    color: colors.white,
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   suggestionsContainer: {
     backgroundColor: 'transparent',

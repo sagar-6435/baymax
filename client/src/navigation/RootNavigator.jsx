@@ -11,6 +11,8 @@ import VoiceInputScreen from '../pages/health/VoiceInputScreen';
 import MedicineScanner from '../pages/medicine/MedicineScanner';
 import ArFirstAidCamera from '../pages/firstaid/ArFirstAidCamera';
 import ExportOptions from '../pages/reports/ExportOptions';
+import OfflineEmergencyMode from '../pages/firstaid/OfflineEmergencyMode';
+import EmergencyStepViewer from '../pages/firstaid/EmergencyStepViewer';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +40,8 @@ export default function RootNavigator() {
         <Stack.Screen name="MedicineScannerModal" component={MedicineScanner} />
         <Stack.Screen name="ArFirstAidCameraModal" component={ArFirstAidCamera} />
         <Stack.Screen name="ExportOptionsModal" component={ExportOptions} />
+        <Stack.Screen name="OfflineEmergencyMode" component={OfflineEmergencyMode} screenOptions={{ presentation: 'fullScreenModal' }} />
+        <Stack.Screen name="EmergencyStepViewer" component={EmergencyStepViewer} screenOptions={{ presentation: 'fullScreenModal' }} />
       </Stack.Group>
     </Stack.Navigator>
   );
