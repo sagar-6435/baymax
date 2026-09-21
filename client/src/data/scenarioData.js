@@ -2,7 +2,7 @@ export const scenarios = [
   {
     id: 'minor-burn',
     title: 'Minor Burn in the Kitchen',
-    icon: '🔥',
+    icon: 'flame',
     description: 'Your friend accidentally touches a hot pan while cooking.',
     steps: [
       {
@@ -68,7 +68,7 @@ export const scenarios = [
   {
     id: 'choking-adult',
     title: 'Dinner Time Choking',
-    icon: '🍽️',
+    icon: 'restaurant',
     description: 'Someone at the next table suddenly clutches their throat and cannot speak.',
     steps: [
       {

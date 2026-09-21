@@ -6,12 +6,24 @@ import ProgressIndicator from '../../components/onboarding/ProgressIndicator';
 import { useAuth } from '../../context/AuthContext';
 import { userService } from '../../services/userService';
 
+const calculateAge = (dobString) => {
+  if (!dobString) return '';
+  const birthDate = new Date(dobString);
+  const today = new Date();
+  let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    calculatedAge--;
+  }
+  return String(calculatedAge);
+};
+
 const BodyProfileScreen = ({ navigation }) => {
   const { user, updateUser } = useAuth();
   
   const [height, setHeight] = useState(user?.height?.value ? String(user.height.value) : '');
   const [weight, setWeight] = useState(user?.weight?.value ? String(user.weight.value) : '');
-  const [age, setAge] = useState(user?.age ? String(user.age) : '');
+  const [age, setAge] = useState(user?.age ? String(user.age) : calculateAge(user?.dob));
   const [isSaving, setIsSaving] = useState(false);
 
   const handleContinue = async () => {

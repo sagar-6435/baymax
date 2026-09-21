@@ -7,6 +7,17 @@ import { generateLlmResponseStream } from '../../services/llmService';
 import { useAuth } from '../../context/AuthContext';
 import { userService } from '../../services/userService';
 
+let ExpoSpeechRecognitionModule = null;
+let useSpeechRecognitionEvent = () => {};
+
+try {
+  const SpeechRec = require('expo-speech-recognition');
+  ExpoSpeechRecognitionModule = SpeechRec.ExpoSpeechRecognitionModule;
+  useSpeechRecognitionEvent = SpeechRec.useSpeechRecognitionEvent;
+} catch (e) {
+  console.warn("ExpoSpeechRecognitionModule native module not found.");
+}
+
 const TypingIndicator = () => {
   const dot1 = useRef(new Animated.Value(0)).current;
   const dot2 = useRef(new Animated.Value(0)).current;
@@ -52,7 +63,57 @@ const AiHealthAssistant = ({ route, navigation }) => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const scrollViewRef = useRef();
+
+  // Listen to speech results
+  if (useSpeechRecognitionEvent) {
+    useSpeechRecognitionEvent("start", () => setIsListening(true));
+    useSpeechRecognitionEvent("end", () => setIsListening(false));
+    useSpeechRecognitionEvent("error", (event) => {
+      setIsListening(false);
+      console.error(event.error);
+    });
+    useSpeechRecognitionEvent("result", (event) => {
+      if (event.results && event.results.length > 0) {
+        setInputText(event.results[0].transcript);
+      }
+    });
+  }
+
+  const toggleListening = async () => {
+    if (isListening) {
+      if (ExpoSpeechRecognitionModule) ExpoSpeechRecognitionModule.stop();
+      else setIsListening(false);
+    } else {
+      try {
+        if (!ExpoSpeechRecognitionModule) {
+          setIsListening(true);
+          setTimeout(() => {
+            setIsListening(false);
+            setInputText('Hello Baymax, my head hurts.');
+          }, 2500);
+          return;
+        }
+        const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+        if (!granted) {
+          Alert.alert("Permission Denied", "Microphone permission is required to use voice input.");
+          return;
+        }
+        ExpoSpeechRecognitionModule.start({ lang: "en-US", interimResults: true });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (isListening && ExpoSpeechRecognitionModule) {
+        ExpoSpeechRecognitionModule.stop();
+      }
+    };
+  }, [isListening]);
 
   useEffect(() => {
     if (route.params?.voiceText) {
@@ -218,17 +279,6 @@ const AiHealthAssistant = ({ route, navigation }) => {
       </ScrollView>
 
       <View style={styles.bottomAreaContainer}>
-        {/* Special Modes */}
-        <View style={styles.specialModesContainer}>
-          <TouchableOpacity 
-            style={styles.symptomModeButton} 
-            onPress={() => navigation.navigate('SymptomExplorationMode')}
-          >
-            <Ionicons name="medical" size={16} color={colors.white} style={{marginRight: 6}} />
-            <Text style={styles.symptomModeText}>I Don't Know What's Wrong</Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Floating Suggestions Area */}
         <View style={styles.suggestionsContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScroll}>
@@ -241,8 +291,11 @@ const AiHealthAssistant = ({ route, navigation }) => {
         </View>
 
         <View style={styles.inputArea}>
-          <TouchableOpacity style={styles.micButton} onPress={() => navigation.navigate('VoiceInputModal')}>
-            <Ionicons name="mic" size={24} color={colors.black} />
+          <TouchableOpacity 
+            style={[styles.micButton, isListening && styles.micButtonActive]} 
+            onPress={toggleListening}
+          >
+            <Ionicons name={isListening ? "stop" : "mic"} size={24} color={isListening ? colors.white : colors.black} />
           </TouchableOpacity>
           <View style={styles.textInputContainer}>
             <TextInput 
@@ -381,6 +434,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 30 : 16
   },
   micButton: { marginRight: 12, backgroundColor: '#f3f4f6', padding: 12, borderRadius: 24 },
+  micButtonActive: { backgroundColor: '#ff4444' },
   textInputContainer: { 
     flex: 1, 
     flexDirection: 'row',

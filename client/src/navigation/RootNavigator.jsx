@@ -5,6 +5,8 @@ import OnboardingStack from './OnboardingStack';
 import MainTabNavigator from './MainTabNavigator';
 import HealthOnboardingStack from './HealthOnboardingStack';
 import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from 'react';
+import SplashScreen from '../pages/onboarding/SplashScreen';
 
 // Modals
 import VoiceInputScreen from '../pages/health/VoiceInputScreen';
@@ -18,8 +20,20 @@ const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
   const { isAuthenticated, user } = useAuth();
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const isHealthOnboardingComplete = user?.onboarding?.completed || user?.onboarding?.skipped;
+
+  if (showSplash) {
+    return <SplashScreen isGlobal={true} />;
+  }
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

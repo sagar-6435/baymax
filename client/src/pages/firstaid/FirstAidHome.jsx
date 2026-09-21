@@ -21,25 +21,25 @@ const FirstAidHome = ({ navigation }) => {
       <View style={styles.grid}>
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('CprTutorial')}>
           <View style={styles.iconContainer}>
-            <Text style={styles.gridIcon}>❤️‍🩹</Text>
+            <Ionicons name="heart" size={32} color={colors.primary} />
           </View>
           <Text style={styles.gridText}>CPR</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('BleedingTutorial')}>
           <View style={styles.iconContainer}>
-            <Text style={styles.gridIcon}>🩸</Text>
+            <Ionicons name="water" size={32} color={colors.primary} />
           </View>
           <Text style={styles.gridText}>Bleeding</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('BurnsTutorial')}>
           <View style={styles.iconContainer}>
-            <Text style={styles.gridIcon}>🔥</Text>
+            <Ionicons name="flame" size={32} color={colors.primary} />
           </View>
           <Text style={styles.gridText}>Burns</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('FractureInjuryTutorial')}>
           <View style={styles.iconContainer}>
-            <Text style={styles.gridIcon}>🦴</Text>
+            <Ionicons name="bandage" size={32} color={colors.primary} />
           </View>
           <Text style={styles.gridText}>Fracture</Text>
         </TouchableOpacity>
@@ -54,7 +54,7 @@ const FirstAidHome = ({ navigation }) => {
           onPress={() => navigation.navigate('ScenarioPlayer', { scenario })}
         >
           <View style={styles.scenarioIconContainer}>
-            <Text style={styles.scenarioIcon}>{scenario.icon}</Text>
+            <Ionicons name={scenario.icon} size={28} color={colors.primary} />
           </View>
           <View style={styles.scenarioContent}>
             <Text style={styles.scenarioTitle}>{scenario.title}</Text>

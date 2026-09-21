@@ -102,6 +102,7 @@ const ExplainMedicalText = ({ navigation }) => {
       </ScrollView>
     </KeyboardAvoidingView>
   );
+};
 
 
 const styles = StyleSheet.create({

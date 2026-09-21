@@ -12,7 +12,7 @@ const HEALTH_FACTS = [
   "Your heart beats about 100,000 times a day. ❤️"
 ];
 
-const SplashScreen = ({ navigation }) => {
+const SplashScreen = ({ navigation, isGlobal }) => {
   const [fact, setFact] = useState('');
 
   useEffect(() => {
@@ -20,13 +20,14 @@ const SplashScreen = ({ navigation }) => {
     const randomFact = HEALTH_FACTS[Math.floor(Math.random() * HEALTH_FACTS.length)];
     setFact(randomFact);
 
-    // Show splash a bit longer to read the fact (3 seconds)
-    const timer = setTimeout(() => {
-      navigation.replace('Welcome');
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [navigation]);
+    // If used within navigation stack, navigate after 2 seconds
+    if (!isGlobal && navigation) {
+      const timer = setTimeout(() => {
+        navigation.replace('Welcome');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [navigation, isGlobal]);
 
   return (
     <View style={styles.container}>
