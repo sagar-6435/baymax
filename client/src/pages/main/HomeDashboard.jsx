@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Platform, Image, Linking, Alert, PermissionsAndroid, Dimensions } from 'react-native';
-import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Image, Animated, Dimensions, Platform, Linking, PermissionsAndroid, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
 import { colors, globalStyles } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { notificationService } from '../../services/notificationService';
@@ -9,15 +11,37 @@ import { getLearningDataForCondition } from '../../data/learningData';
 import { generateLlmResponse } from '../../services/llmService';
 import { userService } from '../../services/userService';
 
-const { width } = Dimensions.get('window');
+const baymaxVideoSource = require('../../../assets/Robot.mp4');
 
 const HomeDashboard = ({ navigation }) => {
   const { user, updateUser } = useAuth();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width > 380;
+
   const [greeting, setGreeting] = useState({ text: 'Good\nMorning', icon: '☀️' });
-  const bounceAnim = useRef(new Animated.Value(0)).current;
   const bubbleOpacity = useRef(new Animated.Value(0)).current;
+  const bounceAnim = useRef(new Animated.Value(0)).current;
+
+  // Video player configuration
+  const player = useVideoPlayer(baymaxVideoSource, (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
+  });
+
+  // Manage video playback based on screen focus lifecycle
+  useFocusEffect(
+    useCallback(() => {
+      if (player) {
+        player.play();
+      }
+      return () => {
+        if (player) {
+          player.pause();
+        }
+      };
+    }, [player])
+  );
 
   useEffect(() => {
     // Generate daily alerts if applicable
@@ -35,7 +59,6 @@ const HomeDashboard = ({ navigation }) => {
         if (!data || !data.lessons) continue;
 
         for (const lesson of data.lessons) {
-          // Check if lesson already generated
           const exists = updatedLessons.find(
             l => l.condition === condition && l.title === lesson.title
           );
@@ -47,9 +70,9 @@ const HomeDashboard = ({ navigation }) => {
               const response = await generateLlmResponse(prompt);
               
               let cleanResponse = response.trim();
-              if (cleanResponse.startsWith('\`\`\`json')) cleanResponse = cleanResponse.substring(7);
-              else if (cleanResponse.startsWith('\`\`\`')) cleanResponse = cleanResponse.substring(3);
-              if (cleanResponse.endsWith('\`\`\`')) cleanResponse = cleanResponse.substring(0, cleanResponse.length - 3);
+              if (cleanResponse.startsWith('```json')) cleanResponse = cleanResponse.substring(7);
+              else if (cleanResponse.startsWith('```')) cleanResponse = cleanResponse.substring(3);
+              if (cleanResponse.endsWith('```')) cleanResponse = cleanResponse.substring(0, cleanResponse.length - 3);
               
               const parsed = JSON.parse(cleanResponse);
               
@@ -86,23 +109,12 @@ const HomeDashboard = ({ navigation }) => {
     else if (hour < 18) setGreeting({ text: 'Good\nAfternoon', icon: '🌤️' });
     else setGreeting({ text: 'Good\nEvening', icon: '🌙' });
 
-    // Friendly bounce animation and speech bubble instead of full-body wave
+    // Friendly speech bubble entrance animation
     Animated.sequence([
-      Animated.delay(500),
-      Animated.parallel([
-        Animated.timing(bubbleOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-        Animated.sequence([
-          // Wave 1 (Bounce)
-          Animated.timing(bounceAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
-          Animated.timing(bounceAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
-          Animated.delay(300),
-          // Wave 2 (Bounce)
-          Animated.timing(bounceAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
-          Animated.timing(bounceAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
-        ])
-      ]),
-      Animated.delay(1000), // Hold the bubble a bit
-      Animated.timing(bubbleOpacity, { toValue: 0, duration: 300, useNativeDriver: true })
+      Animated.delay(600),
+      Animated.timing(bubbleOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.delay(2000),
+      Animated.timing(bubbleOpacity, { toValue: 0, duration: 400, useNativeDriver: true })
     ]).start();
   }, []);
 
@@ -149,7 +161,6 @@ const HomeDashboard = ({ navigation }) => {
         }
       } catch (err) {
         console.warn(err);
-        // Fallback to standard Linking if native module fails or is missing
         Linking.openURL(`tel:${firstContact.phone}`).catch(() => {
           Alert.alert('Error', 'Failed to open dialer. Make sure your device supports phone calls.');
         });
@@ -171,23 +182,33 @@ const HomeDashboard = ({ navigation }) => {
       {/* Header */}
       <View style={styles.headerRow}>
         <View style={styles.brandRow}>
-          <Ionicons name="heart-circle" size={32} color={colors.primary} />
+          <Ionicons name="heart-circle" size={isLargeScreen ? 36 : 32} color={colors.primary} />
           <View>
-            <Text style={styles.appTitle}>Bay<Text style={{color: colors.primary}}>Max</Text></Text>
-            <Text style={styles.appSubtitle}>Your Health • Your Knowledge • Our Care</Text>
+            <Text style={[styles.appTitle, { fontSize: isLargeScreen ? 26 : 24 }]}>
+              Bay<Text style={{ color: colors.primary }}>Max</Text>
+            </Text>
+            <Text style={[styles.appSubtitle, { fontSize: isLargeScreen ? 11 : 10 }]}>
+              Your Health • Your Knowledge • Our Care
+            </Text>
           </View>
         </View>
-        <Ionicons name="notifications-outline" size={28} color={colors.black} />
+        <TouchableOpacity 
+          accessibilityRole="button"
+          accessibilityLabel="Notifications"
+          onPress={() => navigation.navigate('Notifications')}
+        >
+          <Ionicons name="notifications-outline" size={isLargeScreen ? 30 : 28} color={colors.black} />
+        </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
       
       {/* Greeting and Image Row */}
       <View style={styles.greetingRow}>
         <View style={styles.greetingTextContainer}>
           <Text style={styles.greetingText}>{greeting.text}</Text>
-          <Text style={styles.greetingHighlight}>there! {greeting.icon}</Text>
-          <Text style={styles.subGreeting}>How are you feeling today?</Text>
+          <Text style={[styles.greetingHighlight, isLargeScreen && styles.greetingHighlightLarge]}>there! {greeting.icon}</Text>
+          <Text style={[styles.subGreeting, isLargeScreen && styles.subGreetingLarge, { marginTop: 4 }]}>How are you feeling today?</Text>
         </View>
         <View style={styles.robotContainer}>
           <Animated.View style={[styles.speechBubble, { opacity: bubbleOpacity }]}>
@@ -239,9 +260,11 @@ const HomeDashboard = ({ navigation }) => {
 
       {/* Quick Actions Header */}
       <View style={styles.sectionHeaderRow}>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Ionicons name="grid" size={20} color={colors.primary} style={{marginRight: 8}} />
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Ionicons name="grid" size={isLargeScreen ? 22 : 20} color={colors.primary} style={{ marginRight: 8 }} />
+          <Text style={[styles.sectionTitle, isLargeScreen && styles.sectionTitleLarge]}>
+            Quick Actions
+          </Text>
         </View>
       </View>
 
@@ -261,7 +284,6 @@ const HomeDashboard = ({ navigation }) => {
           </View>
           <Text style={styles.gridText}>First Aid</Text>
           <Text style={styles.gridSubText}>Learn & practice life-saving skills</Text>
-
         </TouchableOpacity>
         
         <TouchableOpacity style={[styles.gridItem, {backgroundColor: '#EEF5FF'}]} onPress={() => navigation.navigate('MedicineHome')}>
@@ -270,7 +292,6 @@ const HomeDashboard = ({ navigation }) => {
           </View>
           <Text style={styles.gridText}>Medicine</Text>
           <Text style={styles.gridSubText}>Track your daily medications</Text>
-
         </TouchableOpacity>
         
         <TouchableOpacity style={[styles.gridItem, {backgroundColor: '#EEFFE8'}]} onPress={() => navigation.navigate('WellnessDashboard')}>
@@ -279,7 +300,6 @@ const HomeDashboard = ({ navigation }) => {
           </View>
           <Text style={styles.gridText}>Wellness</Text>
           <Text style={styles.gridSubText}>Meditation & fitness tracking</Text>
-
         </TouchableOpacity>
       </View>
       
@@ -318,29 +338,113 @@ const HomeDashboard = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.white },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 50, marginBottom: 20, paddingHorizontal: 20 },
-  brandRow: { flexDirection: 'row', alignItems: 'center' },
-  appTitle: { fontSize: 24, fontWeight: '900', color: colors.black, marginLeft: 8 },
-  appSubtitle: { fontSize: 10, color: colors.darkGray, marginLeft: 8 },
-  
-  scrollView: { paddingHorizontal: 20 },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.white 
+  },
+  headerRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    paddingHorizontal: 20, 
+    paddingTop: Platform.OS === 'ios' ? 12 : 20, 
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.white
+  },
+  brandRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 8 
+  },
+  appTitle: { 
+    fontWeight: '900', 
+    letterSpacing: -0.5,
+    color: colors.black
+  },
+  appSubtitle: { 
+    color: colors.darkGray, 
+    fontWeight: '600',
+    marginTop: -2
+  },
 
-  greetingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 },
-  greetingTextContainer: { flex: 1 },
-  greetingText: { fontSize: 32, fontWeight: '900', color: colors.black, lineHeight: 40 },
-  greetingHighlight: { fontSize: 32, fontWeight: '900', color: colors.primary, marginBottom: 15 },
-  subGreeting: { fontSize: 18, color: colors.black },
-  robotContainer: { position: 'relative', alignItems: 'flex-end' },
-  baymaxImage: { width: 150, height: 180, resizeMode: 'contain', marginLeft: 10 },
+  scrollView: { 
+    flex: 1 
+  },
+  scrollContent: { 
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 24 
+  },
+
+  greetingRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    marginBottom: 16,
+    minHeight: 120
+  },
+  greetingTextContainer: { 
+    flex: 1,
+    paddingRight: 10
+  },
+  greetingText: { 
+    fontSize: 28, 
+    fontWeight: '900', 
+    color: colors.black, 
+    lineHeight: 34,
+    letterSpacing: -0.5
+  },
+  greetingTextLarge: { 
+    fontSize: 34, 
+    lineHeight: 40 
+  },
+  greetingHighlight: { 
+    fontSize: 28, 
+    fontWeight: '900', 
+    color: colors.primary,
+    lineHeight: 34,
+    letterSpacing: -0.5,
+    marginTop: 2
+  },
+  greetingHighlightLarge: { 
+    fontSize: 34, 
+    lineHeight: 40 
+  },
+
+  feelingContainer: {
+    marginBottom: 20
+  },
+  subGreeting: { 
+    fontSize: 18, 
+    fontWeight: '700',
+    color: colors.black,
+    letterSpacing: -0.2
+  },
+  subGreetingLarge: { 
+    fontSize: 20 
+  },
+
+  robotContainer: { 
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    position: 'relative'
+  },
+  baymaxImage: {
+    width: 120,
+    height: 120,
+    resizeMode: 'contain'
+  },
   speechBubble: {
     position: 'absolute',
-    top: -10,
-    right: 100,
+    top: -12,
+    right: 40,
     backgroundColor: colors.white,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingVertical: 6,
+    borderRadius: 18,
     borderBottomRightRadius: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -350,72 +454,97 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   speechBubbleText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
     color: colors.black,
   },
-  
-  searchContainer: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    backgroundColor: colors.white, 
-    borderRadius: 30,
-    paddingHorizontal: 20,
-    height: 60,
-    marginBottom: 40,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  searchIcon: { marginRight: 15 },
-  searchInput: { flex: 1, fontSize: 16, color: colors.black },
-  micButton: { backgroundColor: colors.primary, width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  
-  sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  sectionTitle: { fontSize: 20, fontWeight: '900', color: colors.black },
-  viewAllText: { fontSize: 16, fontWeight: 'bold', color: colors.black },
-  
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  gridItem: { 
-    width: '48%', 
-    borderRadius: 24, 
-    padding: 16, 
-    marginBottom: 16, 
-    alignItems: 'flex-start',
-    minHeight: 170
-  },
-  iconWrapper: { width: 70, height: 70, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
-  gridText: { fontSize: 18, fontWeight: '900', color: colors.black, marginBottom: 8 },
-  gridSubText: { fontSize: 14, color: '#555', lineHeight: 20 },
-  arrowButton: { backgroundColor: colors.primary, width: 30, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center', position: 'absolute', bottom: 15, right: 15 },
-  
+
   emergencyButton: {
     backgroundColor: '#FF3B30',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    paddingVertical: 18,
+    paddingHorizontal: 18,
     borderRadius: 20,
-    marginBottom: 30,
+    marginBottom: 22,
     shadowColor: '#FF3B30',
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.35,
     shadowRadius: 10,
-    elevation: 8,
+    elevation: 6,
+  },
+  emergencyButtonLarge: {
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginBottom: 24
   },
   emergencyTitle: {
     color: colors.white,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '900',
-    letterSpacing: 1,
+    letterSpacing: 0.8,
+  },
+  emergencyTitleLarge: {
+    fontSize: 20,
   },
   emergencySub: {
     color: 'rgba(255,255,255,0.9)',
     fontSize: 14,
     fontWeight: '600',
   },
-  
+
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+    marginTop: 4
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: colors.black,
+    letterSpacing: -0.3
+  },
+  sectionTitleLarge: {
+    fontSize: 20
+  },
+
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 16
+  },
+  gridItem: {
+    width: '48%',
+    borderRadius: 22,
+    padding: 16,
+    marginBottom: 16,
+    justifyContent: 'space-between',
+    minHeight: 140,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  iconWrapper: {
+    marginBottom: 12
+  },
+  gridText: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: colors.black,
+    marginBottom: 2
+  },
+  gridSubText: {
+    fontSize: 11,
+    color: colors.darkGray,
+    fontWeight: '600',
+    lineHeight: 14
+  },
+
   learningCard: {
     backgroundColor: '#1E1E1E',
     borderRadius: 24,
@@ -425,7 +554,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
     borderWidth: 2,
-    borderColor: '#FFD700', // yellow accent
+    borderColor: '#FFD700',
   },
   learningIconContainer: {
     backgroundColor: '#FFD700',
@@ -450,7 +579,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 10,
   },
-
   progressBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',

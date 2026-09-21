@@ -1,34 +1,40 @@
 import AppHeader from '../../components/AppHeader';
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
+import PrimaryButton from '../../components/PrimaryButton';
 
-const FirstAidCompletionSummary = ({ navigation }) => {
+const FirstAidCompletionSummary = ({ navigation, route }) => {
+  const guideTitle = route?.params?.title || 'First Aid Guide';
+
   return (
     <View style={styles.container}>
-      <AppHeader showBack={true} onBack={() => navigation.goBack()} />
+      <AppHeader showBack={true} onBack={() => navigation.navigate('FirstAidHome')} title="Summary" />
 
-      <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>MOCK DATA OVERVIEW</Text>
-        
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Information Details</Text>
-          <Text style={styles.cardText}>This is a placeholder page for FIRST AID COMPLETION SUMMARY. Here you would typically see relevant data fetched from the backend API.</Text>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+        <View style={styles.badgeCircle}>
+          <Ionicons name="checkmark-done-circle" size={80} color="#16A34A" />
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recent Activity</Text>
-          <Text style={styles.cardText}>• Checked in at 9:00 AM</Text>
-          <Text style={styles.cardText}>• Updated preferences</Text>
-          <Text style={styles.cardText}>• Synced with wearable</Text>
+        <Text style={styles.title}>Tutorial Completed!</Text>
+        <Text style={styles.subtitle}>
+          You have reviewed all instructions for {guideTitle}. Reviewing emergency protocols regularly helps you stay prepared.
+        </Text>
+
+        <View style={styles.tipCard}>
+          <Ionicons name="information-circle" size={24} color={colors.primary} style={{ marginRight: 12 }} />
+          <Text style={styles.tipText}>
+            In a real life-threatening emergency, always dial 911 immediately before or while administering first aid.
+          </Text>
         </View>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Edit Details</Text>
-        </TouchableOpacity>
-        
-        <View style={{ height: 40 }} />
+        <View style={styles.buttonContainer}>
+          <PrimaryButton 
+            title="Return to First Aid" 
+            onPress={() => navigation.navigate('FirstAidHome')} 
+          />
+        </View>
       </ScrollView>
     </View>
   );
@@ -36,42 +42,59 @@ const FirstAidCompletionSummary = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.white },
-  header: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'space-between', 
-    paddingTop: 50, 
-    paddingBottom: 16, 
-    paddingHorizontal: 20, 
-    backgroundColor: colors.white,
-    borderBottomWidth: 1, 
-    borderBottomColor: colors.border 
+  content: { flex: 1 },
+  contentContainer: {
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: '80%',
   },
-  backButton: { padding: 4 },
-  title: { fontSize: 16, fontWeight: 'bold', letterSpacing: 1, color: colors.black },
-  
-  content: { padding: 20 },
-  sectionTitle: { fontSize: 14, fontWeight: 'bold', color: colors.darkGray, letterSpacing: 1, marginBottom: 16 },
-  
-  card: { 
-    backgroundColor: colors.white, 
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 20, 
-    borderRadius: globalStyles.cardRadius, 
-    marginBottom: 16 
+  badgeCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#F0FDF4',
+    borderWidth: 2,
+    borderColor: '#BBF7D0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
   },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: colors.black, marginBottom: 8 },
-  cardText: { fontSize: 16, color: colors.darkGray, marginBottom: 4, lineHeight: 24 },
-  
-  actionButton: { 
-    backgroundColor: colors.primary, 
-    padding: 16, 
-    borderRadius: globalStyles.buttonRadius, 
-    alignItems: 'center', 
-    marginTop: 10 
+  title: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: colors.black,
+    marginBottom: 10,
+    textAlign: 'center',
   },
-  actionButtonText: { color: colors.black, fontSize: 16, fontWeight: 'bold' }
+  subtitle: {
+    fontSize: 15,
+    color: '#4B5563',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 28,
+  },
+  tipCard: {
+    backgroundColor: '#FFFBEB',
+    borderWidth: 1.5,
+    borderColor: '#FDE68A',
+    borderRadius: 18,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 32,
+    width: '100%',
+  },
+  tipText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#92400E',
+    lineHeight: 20,
+    fontWeight: '500',
+  },
+  buttonContainer: {
+    width: '100%',
+  },
 });
 
 export default FirstAidCompletionSummary;
