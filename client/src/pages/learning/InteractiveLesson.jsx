@@ -33,50 +33,42 @@ const InteractiveLesson = ({ navigation, route }) => {
       setCurrentCard(currentCard + 1);
     } else {
       setIsGeneratingQuiz(true);
-      try {
-        const prompt = `Based on the following lesson content, generate a 5-10 question multiple-choice quiz.
-Output MUST be valid JSON with NO markdown blocks around it. Do not include \`\`\`json.
-The JSON must have this exact structure:
-{
-  "quiz": [
-    {
-      "question": "A multiple choice question about the content",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "answerIndex": 0
-    }
-  ]
-}
-IMPORTANT: The quiz array MUST contain between 5 and 10 questions.
-Lesson Content:
-${rawContent}`;
-        
-        const response = await generateLlmResponse(prompt);
-        let parsedData;
-        try {
-          let cleanResponse = response.trim();
-          if (cleanResponse.startsWith('```json')) cleanResponse = cleanResponse.substring(7);
-          else if (cleanResponse.startsWith('```')) cleanResponse = cleanResponse.substring(3);
-          if (cleanResponse.endsWith('```')) cleanResponse = cleanResponse.substring(0, cleanResponse.length - 3);
-          
-          parsedData = JSON.parse(cleanResponse);
-        } catch (parseError) {
-          console.error("Failed to parse LLM response:", response);
-          Alert.alert("Error", "Baymax got a bit confused generating the quiz. Please try again!");
+        // Hardcoded quiz for prototype
+        setTimeout(() => {
           setIsGeneratingQuiz(false);
-          return;
-        }
-
-        setIsGeneratingQuiz(false);
-        // Combine the existing lesson data with the new quiz array
-        navigation.navigate('Quiz', { 
-          title: lessonTitle, 
-          lessonData: { ...lessonData, quiz: parsedData.quiz } 
-        });
-      } catch (error) {
-        console.error(error);
-        Alert.alert("Error", "Could not generate quiz at this time.");
-        setIsGeneratingQuiz(false);
-      }
+          const mockQuiz = [
+            {
+              question: "What is the primary focus of this lesson?",
+              options: ["Understanding the condition", "Ignoring symptoms", "Taking random pills", "Sleeping all day"],
+              correct: 0
+            },
+            {
+              question: "Why is it important to follow your care plan?",
+              options: ["It isn't", "To manage your health effectively", "To waste time", "Because doctors said so"],
+              correct: 1
+            },
+            {
+              question: "When should you contact a healthcare professional?",
+              options: ["Never", "Only when feeling fine", "If you experience severe or unusual symptoms", "Every 5 minutes"],
+              correct: 2
+            },
+            {
+              question: "What is a good daily habit for this condition?",
+              options: ["Skipping meals", "Drinking plenty of water and resting", "Eating only junk food", "Avoiding all physical activity"],
+              correct: 1
+            },
+            {
+              question: "How can Baymax help you with this?",
+              options: ["By cooking meals", "By providing daily reminders and tips", "By driving you to the doctor", "By doing your homework"],
+              correct: 1
+            }
+          ];
+          
+          navigation.navigate('Quiz', { 
+            title: lessonTitle, 
+            lessonData: { ...lessonData, quiz: mockQuiz } 
+          });
+        }, 1500);
     }
   };
 

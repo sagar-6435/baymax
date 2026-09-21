@@ -43,37 +43,17 @@ const QuizQuestion = ({ navigation, route }) => {
         setEvaluationState('retest_incorrect');
       } else {
         setEvaluationState('generating_retest');
-        try {
-          const prompt = `The user answered incorrectly. Original Question: "${currentQ.question}". Correct Answer: "${currentQ.options[currentQ.correct]}". User's Answer: "${currentQ.options[selectedOption]}". Generate a brief, simple explanation of why they were wrong, and generate ONE new multiple choice question to test this concept again. 
-          Output STRICTLY in valid JSON format with no markdown wrappers:
-          {
-            "explanation": "Brief explanation here", 
-            "retestQuestion": "New question text here", 
-            "options": ["Option 1", "Option 2", "Option 3", "Option 4"], 
-            "correct": 0
-          }`;
-          
-          const response = await generateLlmResponse(prompt, 'You are Baymax, a helpful health companion. You explain concepts simply.');
-          
-          let cleanResponse = response.trim();
-          if (cleanResponse.startsWith('```json')) cleanResponse = cleanResponse.substring(7);
-          else if (cleanResponse.startsWith('```')) cleanResponse = cleanResponse.substring(3);
-          if (cleanResponse.endsWith('```')) cleanResponse = cleanResponse.substring(0, cleanResponse.length - 3);
-          
-          const parsed = JSON.parse(cleanResponse);
-          setExplanationText(parsed.explanation);
+        // Hardcoded retest feedback for prototype
+        setTimeout(() => {
+          setExplanationText("That wasn't quite right. Let's try again with a slightly different question to reinforce the concept!");
           setRetestQuestion({
-            question: parsed.retestQuestion,
-            options: parsed.options,
-            correct: parsed.correct
+            question: `RETEST: ${currentQ.question} (Think carefully!)`,
+            options: currentQ.options,
+            correct: currentQ.correct
           });
           setEvaluationState('retesting');
-          setSelectedOption(null); 
-        } catch (e) {
-          console.error(e);
-          setExplanationText(currentQ.explanation || "That's not quite right. Let's try again.");
-          setEvaluationState('incorrect');
-        }
+          setSelectedOption(null);
+        }, 1000);
       }
     }
   };

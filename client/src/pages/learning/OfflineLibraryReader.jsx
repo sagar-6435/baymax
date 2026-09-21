@@ -38,14 +38,11 @@ const OfflineLibraryReader = ({ navigation }) => {
     const systemPrompt = "You are Baymax, an offline healthcare companion. Answer the user's question based strictly on the provided text context. Keep it simple and concise.";
     const fullPrompt = `Context:\n"${selectedTopic.content}"\n\nUser Question:\n${aiQuestion}`;
 
-    try {
-      const response = await generateLlmResponse(fullPrompt, systemPrompt);
-      setAiResponse(response);
-    } catch (error) {
-      setAiResponse("I'm sorry, my local AI brain is currently unavailable.");
-    } finally {
+    // Hardcoded response for prototype
+    setTimeout(() => {
+      setAiResponse(`Here is some basic information about "${selectedTopic.title}":\n\nThis condition involves taking proactive steps for your well-being. Make sure you follow the guidelines mentioned in the text carefully. If you have any specific concerns, it's always best to consult with a healthcare professional.\n\n(Note: This is a prototype response as AI is currently disabled.)`);
       setIsAiLoading(false);
-    }
+    }, 1000);
   };
 
   if (selectedTopic) {

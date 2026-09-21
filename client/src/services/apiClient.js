@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 
 // Prefer environment variable. If missing, fallback to 10.0.2.2 only on emulator.
 // The user's env file sets it to 192.168.29.254.
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.6:5001/api';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://baymax-z27h.onrender.com/api';
 
 export const apiClient = async (endpoint, options = {}) => {
   const token = await AsyncStorage.getItem('userToken');

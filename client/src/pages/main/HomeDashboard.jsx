@@ -66,25 +66,17 @@ const HomeDashboard = ({ navigation }) => {
           if (!exists) {
             try {
               console.log(`Generating lesson for ${condition}: ${lesson.title}`);
-              const prompt = `Generate an educational health lesson about "${lesson.title}" for a patient with "${condition}". Output MUST be valid JSON with a "content" string. Do not include markdown \`\`\` wrappers, just valid JSON like: {"content": "Your lesson text here. Use \\n\\n for paragraphs."}`;
-              const response = await generateLlmResponse(prompt);
               
-              let cleanResponse = response.trim();
-              if (cleanResponse.startsWith('```json')) cleanResponse = cleanResponse.substring(7);
-              else if (cleanResponse.startsWith('```')) cleanResponse = cleanResponse.substring(3);
-              if (cleanResponse.endsWith('```')) cleanResponse = cleanResponse.substring(0, cleanResponse.length - 3);
+              // Use hardcoded content for prototype
+              const content = `Welcome to the lesson on "${lesson.title}".\n\nManaging ${condition} requires a comprehensive approach. It's important to understand your symptoms and communicate effectively with your healthcare provider.\n\nKey steps include maintaining a balanced lifestyle, following your prescribed care plan, and monitoring for any changes.\n\nAlways remember to consult a professional before making major changes to your routine. Stay healthy!`;
               
-              const parsed = JSON.parse(cleanResponse);
-              
-              if (parsed.content) {
-                updatedLessons.push({
-                  condition,
-                  title: lesson.title,
-                  content: parsed.content
-                });
-                hasNewLessons = true;
-                console.log(`Successfully generated lesson: ${lesson.title}`);
-              }
+              updatedLessons.push({
+                condition,
+                title: lesson.title,
+                content: content
+              });
+              hasNewLessons = true;
+              console.log(`Successfully generated lesson: ${lesson.title}`);
             } catch (err) {
               console.log(`Failed to generate lesson ${lesson.title}`, err);
             }
