@@ -7,6 +7,7 @@ import PrimaryButton from '../../components/PrimaryButton';
 import ProgressIndicator from '../../components/onboarding/ProgressIndicator';
 import { useAuth } from '../../context/AuthContext';
 import { userService } from '../../services/userService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EmergencyContactScreen = ({ navigation }) => {
   const { user, updateUser } = useAuth();
@@ -94,6 +95,7 @@ const EmergencyContactScreen = ({ navigation }) => {
 
       const updatedUser = await userService.updateProfile({ emergencyContacts: contacts });
       await updateUser(updatedUser);
+      await AsyncStorage.setItem('@emergency_contacts', JSON.stringify(contacts));
       navigation.navigate('Completion');
     } catch (error) {
       console.error('Error saving Emergency Contact', error);

@@ -7,6 +7,7 @@ import { colors, globalStyles } from '../../theme';
 import PrimaryButton from '../../components/PrimaryButton';
 import { useAuth } from '../../context/AuthContext';
 import { userService } from '../../services/userService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EmergencyInformation = ({ navigation }) => {
   const { user, updateUser } = useAuth();
@@ -49,15 +50,16 @@ const EmergencyInformation = ({ navigation }) => {
   };
 
   const handleAddContact = async () => {
-    if (!newContact.name || !newContact.phone) {
-      Alert.alert('Error', 'Name and Phone are required.');
+    if (!newContact.name || !newContact.phone || !newContact.relation) {
+      Alert.alert('Error', 'Name, Relationship, and Phone are required.');
       return;
     }
     setIsLoading(true);
     try {
       const updatedContacts = [...contacts, newContact];
       const updatedUser = await userService.updateProfile({ emergencyContacts: updatedContacts });
-      await updateUser(updatedUser);
+      updateUser(updatedUser); // Context update
+      AsyncStorage.setItem('@emergency_contacts', JSON.stringify(updatedContacts)).catch(console.error);
       setModalVisible(false);
       setNewContact({ name: '', relation: '', phone: '' });
     } catch (error) {
@@ -78,6 +80,7 @@ const EmergencyInformation = ({ navigation }) => {
             const updatedContacts = contacts.filter((_, i) => i !== index);
             const updatedUser = await userService.updateProfile({ emergencyContacts: updatedContacts });
             await updateUser(updatedUser);
+            await AsyncStorage.setItem('@emergency_contacts', JSON.stringify(updatedContacts));
           } catch (error) {
             Alert.alert('Error', 'Failed to remove contact');
           }

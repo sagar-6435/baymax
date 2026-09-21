@@ -7,10 +7,6 @@ export const userService = {
       method: 'PUT',
       body: JSON.stringify(userData),
     });
-    
-    if (response) {
-      await AsyncStorage.setItem('userData', JSON.stringify(response));
-    }
     return response;
   },
   

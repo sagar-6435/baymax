@@ -197,6 +197,34 @@ const HomeDashboard = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       
+      {/* Continue Learning Card */}
+      <TouchableOpacity 
+        style={styles.learningCard} 
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate('LearningTab')}
+      >
+        <View style={styles.learningIconContainer}>
+          <Ionicons name="book" size={32} color={colors.black} />
+        </View>
+        
+        <View style={styles.learningTextContainer}>
+          <Text style={styles.learningTitle}>Continue Learning</Text>
+          <Text style={styles.learningSub}>Build a healthier you, one lesson at a time!</Text>
+          
+          <View style={styles.progressBarContainer}>
+            <View style={styles.progressActive} />
+            <View style={styles.progressInactive} />
+            <View style={styles.progressInactive} />
+            <View style={styles.progressInactive} />
+            <View style={styles.progressInactive} />
+          </View>
+        </View>
+
+        <View style={styles.learningArrowButton}>
+          <Ionicons name="arrow-forward" size={20} color={colors.black} />
+        </View>
+      </TouchableOpacity>
+
       <View style={{height: 40}} />
       </ScrollView>
     </View>
@@ -300,6 +328,68 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
     fontSize: 14,
     fontWeight: '600',
+  },
+  
+  learningCard: {
+    backgroundColor: '#1E1E1E',
+    borderRadius: 24,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: '#FFD700', // yellow accent
+  },
+  learningIconContainer: {
+    backgroundColor: '#FFD700',
+    width: 60,
+    height: 60,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  learningTextContainer: {
+    flex: 1,
+  },
+  learningTitle: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  learningSub: {
+    color: '#AAA',
+    fontSize: 12,
+    marginBottom: 10,
+  },
+  progressBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  progressActive: {
+    width: 30,
+    height: 4,
+    backgroundColor: '#FFD700',
+    borderRadius: 2,
+    marginRight: 4,
+  },
+  progressInactive: {
+    width: 20,
+    height: 4,
+    backgroundColor: '#444',
+    borderRadius: 2,
+    marginRight: 4,
+  },
+  learningArrowButton: {
+    backgroundColor: '#FFD700',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
   }
 });
 
