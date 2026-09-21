@@ -49,8 +49,8 @@ const EmergencyInformation = ({ navigation }) => {
   };
 
   const handleAddContact = async () => {
-    if (!newContact.name || !newContact.phone) {
-      Alert.alert('Error', 'Name and Phone are required.');
+    if (!newContact.name || !newContact.phone || !newContact.relation) {
+      Alert.alert('Error', 'Name, Relationship, and Phone are required.');
       return;
     }
     setIsLoading(true);
@@ -61,7 +61,7 @@ const EmergencyInformation = ({ navigation }) => {
       setModalVisible(false);
       setNewContact({ name: '', relation: '', phone: '' });
     } catch (error) {
-      Alert.alert('Error', 'Failed to add contact');
+      Alert.alert('Error', error.message || 'Failed to add contact');
     } finally {
       setIsLoading(false);
     }

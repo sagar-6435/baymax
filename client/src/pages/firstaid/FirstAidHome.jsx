@@ -269,16 +269,16 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   iconContainer: { 
-    width: 54,
-    height: 54,
+    width: 80,
+    height: 80,
     borderRadius: 16, 
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
   },
   gridIconImage: {
-    width: 50,
-    height: 50,
+    width: 76,
+    height: 76,
     resizeMode: 'contain'
   },
   gridText: { 
