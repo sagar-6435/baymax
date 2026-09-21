@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { colors, globalStyles } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
 import { scenarios } from '../../data/scenarioData';
@@ -21,25 +21,25 @@ const FirstAidHome = ({ navigation }) => {
       <View style={styles.grid}>
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('CprTutorial')}>
           <View style={styles.iconContainer}>
-            <Ionicons name="heart" size={32} color={colors.primary} />
+            <Image source={require('../../../assets/labels/cpr.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
           </View>
           <Text style={styles.gridText}>CPR</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('BleedingTutorial')}>
           <View style={styles.iconContainer}>
-            <Ionicons name="water" size={32} color={colors.primary} />
+            <Image source={require('../../../assets/labels/bleeding.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
           </View>
           <Text style={styles.gridText}>Bleeding</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('BurnsTutorial')}>
           <View style={styles.iconContainer}>
-            <Ionicons name="flame" size={32} color={colors.primary} />
+            <Image source={require('../../../assets/labels/burns.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
           </View>
           <Text style={styles.gridText}>Burns</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('FractureInjuryTutorial')}>
           <View style={styles.iconContainer}>
-            <Ionicons name="bandage" size={32} color={colors.primary} />
+            <Image source={require('../../../assets/labels/fracture.png')} style={{width: 80, height: 80, resizeMode: 'contain'}} />
           </View>
           <Text style={styles.gridText}>Fracture</Text>
         </TouchableOpacity>
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center' 
   },
   iconContainer: { 
-    backgroundColor: colors.lightGray, 
+    backgroundColor: 'transparent',
     padding: 12, 
     borderRadius: 24, 
     marginBottom: 12 

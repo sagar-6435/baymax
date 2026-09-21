@@ -149,18 +149,6 @@ const HomeDashboard = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Emergency Mode Entry */}
-      <TouchableOpacity 
-        style={styles.emergencyButton} 
-        onPress={() => navigation.navigate('OfflineEmergencyMode')}
-      >
-        <Ionicons name="warning" size={28} color={colors.white} style={{ marginRight: 10 }} />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.emergencyTitle}>EMERGENCY / SOS</Text>
-          <Text style={styles.emergencySub}>Tap for offline first-aid guidance</Text>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={colors.white} />
-      </TouchableOpacity>
 
 
       {/* Quick Actions Header */}
@@ -175,7 +163,7 @@ const HomeDashboard = ({ navigation }) => {
       <View style={styles.grid}>
         <TouchableOpacity style={[styles.gridItem, {backgroundColor: '#FFF9E6'}]} onPress={() => navigation.navigate('HealthTab')}>
           <View style={styles.iconWrapper}>
-            <Ionicons name="chatbubbles" size={24} color={colors.black} />
+            <Image source={require('../../../assets/labels/Ai-health.png')} style={{width: 70, height: 70, resizeMode: 'contain'}} />
           </View>
           <Text style={styles.gridText}>AI Health</Text>
           <Text style={styles.gridSubText}>Get instant health advice from Baymax</Text>
@@ -183,7 +171,7 @@ const HomeDashboard = ({ navigation }) => {
 
         <TouchableOpacity style={[styles.gridItem, {backgroundColor: '#FFEEEE'}]} onPress={() => navigation.navigate('FirstAidTab')}>
           <View style={styles.iconWrapper}>
-            <Ionicons name="medkit" size={24} color="#FF4D4D" />
+            <Image source={require('../../../assets/labels/first-aid.png')} style={{width: 70, height: 70, resizeMode: 'contain'}} />
           </View>
           <Text style={styles.gridText}>First Aid</Text>
           <Text style={styles.gridSubText}>Learn & practice life-saving skills</Text>
@@ -192,7 +180,7 @@ const HomeDashboard = ({ navigation }) => {
         
         <TouchableOpacity style={[styles.gridItem, {backgroundColor: '#EEF5FF'}]} onPress={() => navigation.navigate('MedicineHome')}>
           <View style={styles.iconWrapper}>
-            <Ionicons name="bandage" size={24} color="#0066FF" />
+            <Image source={require('../../../assets/labels/medicine.png')} style={{width: 70, height: 70, resizeMode: 'contain'}} />
           </View>
           <Text style={styles.gridText}>Medicine</Text>
           <Text style={styles.gridSubText}>Track your daily medications</Text>
@@ -201,7 +189,7 @@ const HomeDashboard = ({ navigation }) => {
         
         <TouchableOpacity style={[styles.gridItem, {backgroundColor: '#EEFFE8'}]} onPress={() => navigation.navigate('WellnessDashboard')}>
           <View style={styles.iconWrapper}>
-            <Ionicons name="fitness" size={24} color="#339933" />
+            <Image source={require('../../../assets/labels/wellness.png')} style={{width: 70, height: 70, resizeMode: 'contain'}} />
           </View>
           <Text style={styles.gridText}>Wellness</Text>
           <Text style={styles.gridSubText}>Meditation & fitness tracking</Text>
@@ -282,9 +270,9 @@ const styles = StyleSheet.create({
     padding: 16, 
     marginBottom: 16, 
     alignItems: 'flex-start',
-    minHeight: 140
+    minHeight: 170
   },
-  iconWrapper: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
+  iconWrapper: { width: 70, height: 70, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
   gridText: { fontSize: 18, fontWeight: '900', color: colors.black, marginBottom: 8 },
   gridSubText: { fontSize: 14, color: '#555', lineHeight: 20 },
   arrowButton: { backgroundColor: colors.primary, width: 30, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center', position: 'absolute', bottom: 15, right: 15 },

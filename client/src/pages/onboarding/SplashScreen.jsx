@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { colors } from '../../theme';
 
 const HEALTH_FACTS = [
-  "Laughing for 15 minutes burns about 40 calories! 😂",
-  "Your nose can remember 50,000 different scents. 👃",
-  "Apples are more effective at waking you up than coffee! 🍏",
-  "You use 200 muscles to take a single step. 🚶",
-  "Your body has enough iron in it to make a 3-inch nail. 🔨",
-  "A sneeze can travel up to 100 miles per hour! 🤧",
-  "Your heart beats about 100,000 times a day. ❤️"
+  "Laughter is the best medicine, unless you have diarrhea. 😬",
+  "An apple a day keeps anyone away, if thrown hard enough. 🍏",
+  "I’m on a seafood diet. I see food and I eat it. 🦞",
+  "Running late totally counts as my daily cardio. 🏃‍♂️",
+  "My favorite exercise is a cross between a lunge and a crunch... lunch! 🍕",
+  "Does refusing to go to the gym count as resistance training? 🏋️‍♂️",
+  "I run... out of patience, mostly. 🐢"
 ];
 
 const SplashScreen = ({ navigation, isGlobal }) => {
@@ -24,14 +24,21 @@ const SplashScreen = ({ navigation, isGlobal }) => {
     if (!isGlobal && navigation) {
       const timer = setTimeout(() => {
         navigation.replace('Welcome');
-      }, 2000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [navigation, isGlobal]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.brandTitle}>BayMax</Text>
+      <View style={styles.centerContent}>
+        <Image 
+          source={require('../../../assets/baymax_robot.png')} 
+          style={styles.robotImage}
+        />
+        <Text style={styles.brandTitle}>BayMax</Text>
+      </View>
+      
       <View style={styles.factContainer}>
         <Text style={styles.didYouKnow}>Did you know?</Text>
         <Text style={styles.factText}>{fact}</Text>
@@ -43,28 +50,34 @@ const SplashScreen = ({ navigation, isGlobal }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1, 
-    justifyContent: "center", 
+    justifyContent: "space-between", 
     alignItems: "center",
     backgroundColor: colors.primary,
-    padding: 20
+    padding: 20,
+    paddingTop: 80,
+    paddingBottom: 50,
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  robotImage: {
+    width: 220,
+    height: 250,
+    resizeMode: 'contain',
+    marginBottom: 10,
   },
   brandTitle: {
-    fontSize: 42,
-    fontWeight: 'bold',
+    fontSize: 48,
+    fontWeight: '900',
     color: colors.black,
-    marginBottom: 60,
+    letterSpacing: 2,
   },
   factContainer: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
     padding: 20,
-    borderRadius: 16,
     alignItems: 'center',
     width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
   },
   didYouKnow: {
     fontSize: 16,
@@ -75,11 +88,11 @@ const styles = StyleSheet.create({
     letterSpacing: 1
   },
   factText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: colors.black,
     textAlign: 'center',
-    lineHeight: 26,
+    lineHeight: 24,
   }
 });
 
