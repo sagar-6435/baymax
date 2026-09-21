@@ -44,6 +44,30 @@ const HomeDashboard = ({ navigation }) => {
   );
 
   useEffect(() => {
+    const checkAndRequestPermissions = async () => {
+      if (Platform.OS === 'android') {
+        try {
+          const permissionsToRequest = [
+            PermissionsAndroid.PERMISSIONS.CAMERA,
+            PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+            PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+            PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          ];
+          
+          if (Platform.Version >= 33) {
+            permissionsToRequest.push(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+          }
+          
+          await PermissionsAndroid.requestMultiple(permissionsToRequest);
+        } catch (err) {
+          console.warn(err);
+        }
+      }
+    };
+    
+    checkAndRequestPermissions();
+
     // Generate daily alerts if applicable
     notificationService.generateDailyMedicationAlerts(user, updateUser);
 
