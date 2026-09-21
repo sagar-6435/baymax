@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Image, Animated, Dimensions } from 'react-native';
+=======
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, useWindowDimensions, Platform, Image, Linking, Alert, PermissionsAndroid } from 'react-native';
+import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
+>>>>>>> 9f20638 (emergency contacts)
 import { Ionicons } from '@expo/vector-icons';
 import { colors, globalStyles } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
@@ -105,6 +111,7 @@ const HomeDashboard = ({ navigation }) => {
     ]).start();
   }, []);
 
+<<<<<<< HEAD
   const translateY = bounceAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [0, -10]
@@ -114,6 +121,57 @@ const HomeDashboard = ({ navigation }) => {
     inputRange: [0, 1],
     outputRange: [1, 1.02]
   });
+=======
+  const handleCallEmergencyContact = async () => {
+    if (user?.emergencyContacts && user.emergencyContacts.length > 0) {
+      const firstContact = user.emergencyContacts[0];
+      
+      try {
+        if (Platform.OS === 'android') {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+            {
+              title: 'Phone Call Permission',
+              message: 'BayMax needs permission to make phone calls automatically for emergency situations.',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            }
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            RNImmediatePhoneCall.immediatePhoneCall(firstContact.phone);
+          } else {
+            Alert.alert(
+              'Permission Denied',
+              'Without permission, BayMax can only open the dialer. Would you like to do that?',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Open Dialer', onPress: () => Linking.openURL(`tel:${firstContact.phone}`) }
+              ]
+            );
+          }
+        } else {
+          RNImmediatePhoneCall.immediatePhoneCall(firstContact.phone);
+        }
+      } catch (err) {
+        console.warn(err);
+        // Fallback to standard Linking if native module fails or is missing
+        Linking.openURL(`tel:${firstContact.phone}`).catch(() => {
+          Alert.alert('Error', 'Failed to open dialer. Make sure your device supports phone calls.');
+        });
+      }
+    } else {
+      Alert.alert(
+        'No Emergency Contacts',
+        'You have not added any emergency contacts yet.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Add Contact', onPress: () => navigation.navigate('EmergencyInformation') }
+        ]
+      );
+    }
+  };
+>>>>>>> 9f20638 (emergency contacts)
 
   return (
     <View style={styles.container}>
@@ -129,6 +187,7 @@ const HomeDashboard = ({ navigation }) => {
         <Ionicons name="notifications-outline" size={28} color={colors.black} />
       </View>
 
+<<<<<<< HEAD
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
       
       {/* Greeting and Image Row */}
@@ -137,6 +196,33 @@ const HomeDashboard = ({ navigation }) => {
           <Text style={styles.greetingText}>{greeting.text}</Text>
           <Text style={styles.greetingHighlight}>there! {greeting.icon}</Text>
           <Text style={styles.subGreeting}>How are you feeling today?</Text>
+=======
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Greeting and BayMax Video Row */}
+        <View style={styles.greetingRow}>
+          <View style={styles.greetingTextContainer}>
+            <Text style={[styles.greetingText, isLargeScreen && styles.greetingTextLarge]}>
+              {greeting.text}
+            </Text>
+            <Text style={[styles.greetingHighlight, isLargeScreen && styles.greetingHighlightLarge]}>
+              there! {greeting.icon}
+            </Text>
+          </View>
+          <View style={styles.robotContainer}>
+            <View style={styles.videoWrapper}>
+              <VideoView
+                player={player}
+                style={styles.baymaxVideo}
+                nativeControls={false}
+                contentFit="contain"
+              />
+            </View>
+          </View>
+>>>>>>> 9f20638 (emergency contacts)
         </View>
         <View style={styles.robotContainer}>
           <Animated.View style={[styles.speechBubble, { opacity: bubbleOpacity }]}>
@@ -149,6 +235,7 @@ const HomeDashboard = ({ navigation }) => {
         </View>
       </View>
 
+<<<<<<< HEAD
 
 
       {/* Quick Actions Header */}
@@ -168,6 +255,44 @@ const HomeDashboard = ({ navigation }) => {
           <Text style={styles.gridText}>AI Health</Text>
           <Text style={styles.gridSubText}>Get instant health advice from Baymax</Text>
         </TouchableOpacity>
+=======
+        {/* Emergency Actions Row */}
+        <View style={{ flexDirection: 'row', gap: 12, marginBottom: 22 }}>
+          {/* Emergency Mode Entry */}
+          <TouchableOpacity 
+            style={[styles.emergencyButton, isLargeScreen && styles.emergencyButtonLarge, { flex: 1, marginBottom: 0, paddingHorizontal: 12 }]} 
+            onPress={() => navigation.navigate('OfflineEmergencyMode')}
+            activeOpacity={0.88}
+          >
+            <Ionicons name="warning" size={isLargeScreen ? 28 : 24} color={colors.white} style={{ marginRight: 8 }} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.emergencyTitle, { fontSize: 15 }]}>
+                Emergency Guide
+              </Text>
+              <Text style={[styles.emergencySub, { fontSize: 11 }]} numberOfLines={1}>
+                Offline aid
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Call Emergency Contact */}
+          <TouchableOpacity 
+            style={[styles.emergencyButton, isLargeScreen && styles.emergencyButtonLarge, { flex: 1, marginBottom: 0, paddingHorizontal: 12 }]} 
+            onPress={handleCallEmergencyContact}
+            activeOpacity={0.88}
+          >
+            <Ionicons name="call" size={isLargeScreen ? 28 : 24} color={colors.white} style={{ marginRight: 8 }} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.emergencyTitle, { fontSize: 16 }]}>
+                CONTACT
+              </Text>
+              <Text style={[styles.emergencySub, { fontSize: 11 }]} numberOfLines={1}>
+                Call now
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+>>>>>>> 9f20638 (emergency contacts)
 
         <TouchableOpacity style={[styles.gridItem, {backgroundColor: '#FFEEEE'}]} onPress={() => navigation.navigate('FirstAidTab')}>
           <View style={styles.iconWrapper}>
@@ -225,7 +350,39 @@ const HomeDashboard = ({ navigation }) => {
         </View>
       </TouchableOpacity>
 
+<<<<<<< HEAD
       <View style={{height: 40}} />
+=======
+        {/* Continue Learning Card */}
+        <TouchableOpacity 
+          style={styles.learningCard} 
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate('LearningTab')}
+        >
+          <View style={styles.learningIconContainer}>
+            <Ionicons name="book" size={32} color={colors.black} />
+          </View>
+          
+          <View style={styles.learningTextContainer}>
+            <Text style={[styles.learningTitle, isLargeScreen && styles.learningTitleLarge]}>Continue Learning</Text>
+            <Text style={[styles.learningSub, isLargeScreen && styles.learningSubLarge]}>Build a healthier you, one lesson at a time!</Text>
+            
+            <View style={styles.progressBarContainer}>
+              <View style={styles.progressActive} />
+              <View style={styles.progressInactive} />
+              <View style={styles.progressInactive} />
+              <View style={styles.progressInactive} />
+              <View style={styles.progressInactive} />
+            </View>
+          </View>
+
+          <View style={styles.learningArrowButton}>
+            <Ionicons name="arrow-forward" size={20} color={colors.black} />
+          </View>
+        </TouchableOpacity>
+
+        <View style={{ height: 40 }} />
+>>>>>>> 9f20638 (emergency contacts)
       </ScrollView>
     </View>
   );
@@ -364,6 +521,53 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 10,
   },
+<<<<<<< HEAD
+=======
+  gridSubTextLarge: { 
+    fontSize: 14, 
+    lineHeight: 21 
+  },
+  learningCard: {
+    backgroundColor: '#1E1E1E',
+    borderRadius: 24,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: '#FFD700', // yellow accent
+  },
+  learningIconContainer: {
+    backgroundColor: '#FFD700',
+    width: 60,
+    height: 60,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  learningTextContainer: {
+    flex: 1,
+  },
+  learningTitle: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  learningTitleLarge: {
+    fontSize: 20,
+  },
+  learningSub: {
+    color: '#AAA',
+    fontSize: 12,
+    marginBottom: 10,
+  },
+  learningSubLarge: {
+    fontSize: 13,
+  },
+>>>>>>> 9f20638 (emergency contacts)
   progressBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',

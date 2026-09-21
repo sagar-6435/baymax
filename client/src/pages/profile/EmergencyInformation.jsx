@@ -63,7 +63,7 @@ const EmergencyInformation = ({ navigation }) => {
       setModalVisible(false);
       setNewContact({ name: '', relation: '', phone: '' });
     } catch (error) {
-      Alert.alert('Error', 'Failed to add contact');
+      Alert.alert('Error', error.message || 'Failed to add contact');
     } finally {
       setIsLoading(false);
     }
