@@ -1,9 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-// Prefer environment variable. If missing, fallback to 10.0.2.2 only on emulator.
-// The user's env file sets it to 192.168.29.254.
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://baymax-z27h.onrender.com/api';
+// Use deployed server (Render)
+const API_BASE_URL = 'https://baymax-z27h.onrender.com/api';
 
 export const apiClient = async (endpoint, options = {}) => {
   const token = await AsyncStorage.getItem('userToken');
@@ -15,7 +14,7 @@ export const apiClient = async (endpoint, options = {}) => {
   };
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+  const timeoutId = setTimeout(() => controller.abort(), 60000); // 60-second timeout
 
   const config = {
     ...options,
